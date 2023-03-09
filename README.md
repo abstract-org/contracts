@@ -26,8 +26,8 @@ https://goerlifaucet.com/
 3. Start local node
    `npx hardhat node`
 
-4. Deploy Factory
-   `npx hardhat run --network goerly scripts/deployDeterministicFactory.ts`
+4. Deploy Simple Factory + Token for testing
+   `npx hardhat run --network goerly scripts/deploySimple.ts`
 
 5. Deploy USDCOV Virtual Currency
    `npx hardhat run --network goerly scripts/deployUSDCOV.ts`

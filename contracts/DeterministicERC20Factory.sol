@@ -10,19 +10,18 @@ contract ERC20Factory {
     string memory name,
     string memory symbol,
     string memory kind,
-    string memory content,
-    address template
+    string memory content
   ) public returns (address) {
     bytes32 salt = keccak256(abi.encodePacked(kind, content));
     bytes memory bytecode = type(ERC20).creationCode;
 
-    if (template == address(0x0)) {
-      revert("Invalid template address");
-    }
-
     address token;
     assembly {
       token := create2(0, add(bytecode, 32), mload(bytecode), salt)
+
+      if iszero(extcodesize(token)) {
+        revert(0, 0)
+      }
     }
 
     bytes memory constructorData = abi.encodeWithSignature(
@@ -30,7 +29,7 @@ contract ERC20Factory {
       name,
       symbol
     );
-    (bool success, ) = template.delegatecall(constructorData);
+    (bool success, ) = token.delegatecall(constructorData);
     require(success, "Failed to initialize token");
 
     emit TokenCreated(token);

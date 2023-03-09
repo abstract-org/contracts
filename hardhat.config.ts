@@ -5,19 +5,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const config: HardhatUserConfig = {
-  solidity: {
-    compilers: [
-      {
-        version: '0.7.6',
-      },
-      {
-        version: '0.8.9',
-      },
-    ],
-  },
-  defaultNetwork: 'goerly',
+  solidity: '0.8.9',
+  defaultNetwork: 'goerli',
   networks: {
-    goerly: {
+    hardhat: {},
+    goerli: {
       url:
         process.env.TESTNET_ALCHEMY_URL! + process.env.TESTNET_ALCHEMY_API_KEY!,
       accounts: [`0x${process.env.TESTNET_PRIVATE_KEY}`],
