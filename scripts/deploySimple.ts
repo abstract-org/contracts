@@ -1,7 +1,6 @@
 import { ethers } from 'hardhat';
 import { ContractFactory } from 'ethers';
-import { SimpleToken } from '../typechain-types/contracts/SimpleToken';
-import { SimpleFactory } from '../typechain-types/contracts/SimpleFactory';
+import { SimpleToken, SimpleFactory } from '../typechain-types';
 
 async function main() {
   const [deployer] = await ethers.getSigners();
