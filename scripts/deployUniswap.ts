@@ -2,11 +2,6 @@ import {UniswapV3Deployer} from '../utils/UniswapV3Deployer'
 import {ethers} from "hardhat";
 import Table from "cli-table3";
 
-
-// TODO: Should replace these with the proper typechain output.
-// type INonfungiblePositionManager = Contract;
-// type IUniswapV3Factory = Contract;
-
 async function main() {
     const [deployer] = await ethers.getSigners();
 
