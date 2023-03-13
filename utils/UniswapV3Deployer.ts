@@ -1,6 +1,7 @@
 import {Contract, ContractFactory, Signer} from "ethers";
 import {linkLibraries} from "./linkLibraries";
 import WETH9 from "./WETH9.json";
+import Table from "cli-table3";
 
 type ContractJson = { abi: any; bytecode: string };
 
@@ -14,7 +15,7 @@ const artifacts: { [name: string]: ContractJson } = {
 };
 
 export class UniswapV3Deployer {
-    static async deploy(actor: Signer): Promise<{ [name: string]: Contract }> {
+    static async deploy(actor: Signer): Promise<{ weth9: Contract, factory: Contract, router: Contract, nftDescriptorLibrary: Contract, positionDescriptor: Contract, positionManager: Contract }> {
         const deployer = new UniswapV3Deployer(actor);
 
         const weth9 = await deployer.deployWETH9();
@@ -39,6 +40,18 @@ export class UniswapV3Deployer {
             positionDescriptor,
             positionManager,
         };
+    }
+
+    static toTable(contracts: { [name: string]: Contract }) {
+        const table = new Table({
+            head: ["Contract", "Address"],
+            style: {border: []},
+        });
+        for (const item of Object.keys(contracts)) {
+            table.push([item, contracts[item].address]);
+        }
+
+        return table.toString();
     }
 
     deployer: Signer;
