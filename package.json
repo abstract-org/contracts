@@ -62,6 +62,7 @@
     "@uniswap/sdk": "^3.0.3",
     "@uniswap/sdk-core": "^3.2.2",
     "@uniswap/v3-periphery": "^1.4.3",
-    "@uniswap/v3-sdk": "^3.9.0"
+    "@uniswap/v3-sdk": "^3.9.0",
+    "jsbi": "^4.3.0"
   }
 }

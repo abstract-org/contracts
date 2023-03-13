@@ -16,11 +16,6 @@ contract USDCOV {
     balanceOf[_owner] = totalSupply;
   }
 
-  modifier onlyOwner() {
-    require(msg.sender == owner, "Only the owner can perform this action");
-    _;
-  }
-
   function transfer(address to, uint256 value) external returns (bool) {
     require(
       value > 0 && value <= balanceOf[msg.sender],
@@ -47,7 +42,7 @@ contract USDCOV {
     return true;
   }
 
-  function mint(address to, uint256 value) external onlyOwner returns (bool) {
+  function mint(address to, uint256 value) external returns (bool) {
     require(value > 0, "Invalid amount to mint");
     balanceOf[to] += value;
     totalSupply += value;
