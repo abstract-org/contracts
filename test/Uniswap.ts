@@ -11,7 +11,6 @@ import { expect } from 'chai';
 import { getPoolData } from '../utils/getPoolData';
 import { encodePriceSqrt } from '../utils/encodePriceSqrt';
 import { BigintIsh, JSBI } from '@uniswap/sdk';
-import WETH9ABI from '../utils/WETH9.json';
 
 const CHAIN_ID = config.networks?.hardhat?.chainId ?? 31337;
 
@@ -67,13 +66,12 @@ describe('Uniswap', () => {
 
   it('Creates pool', async () => {
     const { Uniswap, TestToken, deployer } = await deployUniswapFixture();
-    const coinAddress = process.env.LOCALNET_COIN_ADDR ?? Uniswap.weth9.address;
     const { receipt, poolAddress } = await deployPoolFixture(
       Uniswap.factory,
       Uniswap.positionManager,
       deployer,
       {
-        token0: coinAddress,
+        token0: Uniswap.weth9.address,
         token1: TestToken.address,
         fee: 500,
       }
@@ -85,13 +83,12 @@ describe('Uniswap', () => {
 
   it('Adds liquidity position', async () => {
     const { Uniswap, TestToken, Weth, deployer } = await deployUniswapFixture();
-    const coinAddress = process.env.LOCALNET_COIN_URL ?? Uniswap.weth9.address;
     const { pool } = await deployPoolFixture(
       Uniswap.factory,
       Uniswap.positionManager,
       deployer,
       {
-        token0: coinAddress,
+        token0: Uniswap.weth9.address,
         token1: TestToken.address,
         fee: 500,
       }
