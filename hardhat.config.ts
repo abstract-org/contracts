@@ -1,6 +1,6 @@
 import { HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-toolbox';
-import "@nomiclabs/hardhat-ethers";
+import '@nomiclabs/hardhat-ethers';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -11,7 +11,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {},
     goerli: {
-      url: 'https://nd-859-124-678.p2pify.com/a7da82774e6a23d13ac2d631d640a48c'
+      url: 'https://nd-859-124-678.p2pify.com/a7da82774e6a23d13ac2d631d640a48c',
       // url:
       //   process.env.TESTNET_ALCHEMY_URL! + process.env.TESTNET_ALCHEMY_API_KEY!,
       // accounts: [`0x${process.env.TESTNET_PRIVATE_KEY}`],

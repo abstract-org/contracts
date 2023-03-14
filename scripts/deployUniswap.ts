@@ -1,19 +1,19 @@
-import {UniswapV3Deployer} from '../utils/UniswapV3Deployer'
-import {ethers} from "hardhat";
+import { UniswapV3Deployer } from '../utils/UniswapV3Deployer';
+import { ethers } from 'hardhat';
 
 async function main() {
-    const [deployer] = await ethers.getSigners();
+  const [deployer] = await ethers.getSigners();
 
-    console.log('Deploying from: ', deployer.address)
+  console.log('Deploying from: ', deployer.address);
 
-    const contracts = await UniswapV3Deployer.deploy(deployer)
+  const contracts = await UniswapV3Deployer.deploy(deployer);
 
-    console.info(UniswapV3Deployer.toTable(contracts));
+  console.info(UniswapV3Deployer.toTable(contracts));
 }
 
 main()
-    .then(() => process.exit(0))
-    .catch((error) => {
-        console.error(error);
-        process.exit(1);
-    });
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
