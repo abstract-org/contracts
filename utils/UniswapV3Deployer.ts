@@ -15,8 +15,10 @@ const artifacts: { [name: string]: ContractJson } = {
 };
 
 export class UniswapV3Deployer {
-  static async deploy(actor: Signer): Promise<{
-    weth9: Contract;
+  static async deploy(
+    actor: Signer,
+    Weth: Contract
+  ): Promise<{
     factory: Contract;
     router: Contract;
     nftDescriptorLibrary: Contract;
@@ -25,22 +27,20 @@ export class UniswapV3Deployer {
   }> {
     const deployer = new UniswapV3Deployer(actor);
 
-    const weth9 = await deployer.deployWETH9();
     const factory = await deployer.deployFactory();
-    const router = await deployer.deployRouter(factory.address, weth9.address);
+    const router = await deployer.deployRouter(factory.address, Weth.address);
     const nftDescriptorLibrary = await deployer.deployNFTDescriptorLibrary();
     const positionDescriptor = await deployer.deployPositionDescriptor(
       nftDescriptorLibrary.address,
-      weth9.address
+      Weth.address
     );
     const positionManager = await deployer.deployNonfungiblePositionManager(
       factory.address,
-      weth9.address,
+      Weth.address,
       positionDescriptor.address
     );
 
     return {
-      weth9,
       factory,
       router,
       nftDescriptorLibrary,
@@ -157,6 +157,8 @@ export class UniswapV3Deployer {
     actor: Signer
   ) {
     const factory = new ContractFactory(abi, bytecode, actor);
-    return await factory.deploy(...deployParams);
+    const res = await factory.deploy(...deployParams);
+    await res.deployed();
+    return res;
   }
 }

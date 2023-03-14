@@ -13,93 +13,115 @@ import { DEFAULT_TOKEN_CONFIG } from './TokenFactory';
 import { expect } from 'chai';
 import { getPoolData } from '../utils/getPoolData';
 import { encodePriceSqrt } from '../utils/encodePriceSqrt';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 const CHAIN_ID = 31337;
 
 describe('Uniswap', () => {
   async function deployUniswapFixture() {
     const [deployer] = await ethers.getSigners();
-    const uniswapContracts = await UniswapV3Deployer.deploy(deployer);
     const TestToken = await TokenFactoryDeployer.deploy(
       deployer,
       DEFAULT_TOKEN_CONFIG
     );
+    const Weth = await TokenFactoryDeployer.deploy(deployer, {
+      name: 'Wrapped Ether',
+      symbol: 'WETH',
+      supply: '1000000000',
+    });
 
-    return {
-      Uniswap: uniswapContracts,
-      Weth: uniswapContracts.weth9,
-      TestToken,
-      deployer,
-    };
+    const uniswapContracts = await UniswapV3Deployer.deploy(deployer, Weth);
+
+    console.info(UniswapV3Deployer.toTable(uniswapContracts));
+
+    return { Uniswap: uniswapContracts, Weth, TestToken, deployer };
   }
 
-  async function deployPoolFixture(
+  async function deployPool(
     factory: ethers.Contract,
     positionManager: ethers.Contract,
     deployer: ethers.Signer,
     poolConfig: { token0: string; token1: string; fee: number }
   ) {
     const sqrtPrice = encodePriceSqrt(1, 1);
-
-    const tx = await positionManager
-      .connect(deployer)
-      .createAndInitializePoolIfNecessary(
-        poolConfig.token0,
-        poolConfig.token1,
-        poolConfig.fee,
-        sqrtPrice,
-        { gasLimit: 10000000 }
-      );
-
-    const receipt = await tx.wait();
-
-    const poolAddress = await factory
+    const existingPoolAddress = await factory
       .connect(deployer)
       .getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee);
+    let poolAddress, receipt;
+
+    if (existingPoolAddress === '0x0000000000000000000000000000000000000000') {
+      const tx = await positionManager
+        .connect(deployer)
+        .createAndInitializePoolIfNecessary(
+          poolConfig.token0,
+          poolConfig.token1,
+          poolConfig.fee,
+          sqrtPrice,
+          { gasLimit: 10000000 }
+        );
+
+      receipt = await tx.wait();
+
+      poolAddress = await factory
+        .connect(deployer)
+        .getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee, {
+          gasLimit: ethers.utils.hexlify(1000000),
+        });
+    }
 
     const pool = new ethers.Contract(
       poolAddress,
       IUniswapV3PoolABI.abi,
-      new ethers.providers.Web3Provider(ethers.provider, CHAIN_ID)
+      deployer
     );
 
     return { receipt, poolAddress, pool };
   }
 
   it('Creates pool', async () => {
-    const { Uniswap, TestToken, deployer } = await deployUniswapFixture();
-    const { receipt, poolAddress } = await deployPoolFixture(
-      Uniswap.factory,
-      Uniswap.positionManager,
-      deployer,
-      {
-        token0: Uniswap.weth9.address,
+    const { Uniswap, Weth, TestToken, deployer } = await loadFixture(
+      deployUniswapFixture
+    );
+    const deployPoolFixture = async () =>
+      deployPool(Uniswap.factory, Uniswap.positionManager, deployer, {
+        token0: Weth.address,
         token1: TestToken.address,
         fee: 500,
-      }
-    );
+      });
+    const { receipt, pool } = await loadFixture(deployPoolFixture);
 
-    console.log('Created pool address: ', poolAddress);
-    expect(poolAddress).not.to.equal(0);
+    const [token0, token1] = await Promise.all([pool.token0(), pool.token1()]);
+
+    console.log('Created pool address: ', pool.address);
+    expect(pool.address).not.to.equal(
+      '0x0000000000000000000000000000000000000000'
+    );
+    expect(token0).to.equal(Weth.address);
+    expect(token1).to.equal(TestToken.address);
   });
 
   it('Adds liquidity position', async () => {
-    const { Uniswap, TestToken, Weth, deployer } = await deployUniswapFixture();
-    const { pool } = await deployPoolFixture(
-      Uniswap.factory,
-      Uniswap.positionManager,
-      deployer,
-      {
-        token0: Uniswap.weth9.address,
+    const { Uniswap, TestToken, Weth, deployer } = await loadFixture(
+      deployUniswapFixture
+    );
+    const deployPoolFixture = async () =>
+      deployPool(Uniswap.factory, Uniswap.positionManager, deployer, {
+        token0: Weth.address,
         token1: TestToken.address,
         fee: 500,
-      }
-    );
-
-    // TODO: Failing on getPoolData as response never comes, need to be fixed to move forward
+      });
+    const { pool } = await loadFixture(deployPoolFixture);
 
     const { tick, tickSpacing, fee, liquidity, sqrtPriceX96 } =
       await getPoolData(pool);
+
+    console.log('Pool Data: ', {
+      tick,
+      tickSpacing,
+      fee,
+      liquidity,
+      sqrtPriceX96,
+    });
 
     // Construct Token instances
     const wethToken = new Token(
@@ -130,11 +152,10 @@ describe('Uniswap', () => {
     // Initialize Position
     const position = new Position({
       pool: WETH_TEST_TOKEN_POOL,
-      liquidity: ethers.utils.parseUnits('0.01', 18),
+      liquidity: ethers.utils.parseUnits('0.1', 18),
       tickLower: nearestUsableTick(tick, tickSpacing) - tickSpacing * 2,
       tickUpper: nearestUsableTick(tick, tickSpacing) + tickSpacing * 2,
     });
-    console.log('Position: ', position);
 
     const approvalAmount = ethers.utils.parseUnits('10', 18).toString();
 
@@ -152,10 +173,17 @@ describe('Uniswap', () => {
 
     console.log('Tokens approved');
 
+    await Promise.all([
+      Weth.connect(deployer).transfer(Uniswap.positionManager.address, 1),
+      TestToken.connect(deployer).transfer(Uniswap.positionManager.address, 1),
+    ]);
+
+    console.log('Tokens transferred to Position Manager');
+
     const { amount0: amount0Desired, amount1: amount1Desired } =
       position.mintAmounts;
     const { amount0: amount0Min, amount1: amount1Min } =
-      position.mintAmountsWithSlippage(new Percent(5));
+      position.mintAmountsWithSlippage(new Percent(50, 10_000));
 
     const params = {
       token0: Weth.address,
@@ -165,17 +193,52 @@ describe('Uniswap', () => {
       tickUpper: nearestUsableTick(tick, tickSpacing) + tickSpacing * 2,
       amount0Desired: amount0Desired.toString(),
       amount1Desired: amount1Desired.toString(),
-      amount0Min: amount0Min.toString(),
-      amount1Min: amount1Min.toString(),
+      amount0Min: amount0Desired.toString(),
+      amount1Min: amount1Desired.toString(),
       recipient: deployer.address,
       deadline: Math.floor(Date.now() / 1000) * 60,
     };
 
+    console.log(ethers.utils.formatEther(params.amount0Desired));
     console.log('Position Manager params: ', params);
 
-    await Uniswap.positionManager
-      .connect(deployer)
-      .mint(params, { gasLimit: ethers.utils.hexlify(1000000) });
+    const [wethBalance, testTokenBalance] = await Promise.all([
+      Weth.balanceOf(deployer.address),
+      TestToken.balanceOf(deployer.address),
+    ]);
+
+    const { calldata, value } = NonfungiblePositionManager.addCallParameters(
+      position,
+      {
+        recipient: deployer.address,
+        deadline: Math.floor(Date.now() / 1000) + 60 * 20,
+        slippageTolerance: new Percent(50, 10_000),
+      }
+    );
+
+    await deployer.sendTransaction({
+      data: calldata,
+      to: Uniswap.positionManager.address,
+      value: value,
+      from: deployer.address,
+      gasLimit: ethers.utils.hexlify(1000000),
+    });
+
+    // const positionMintResponse = await Uniswap.positionManager
+    //   .connect(deployer)
+    //   .mint(params, {
+    //     gasLimit: ethers.utils.hexlify(1000000),
+    //   });
+
+    // await positionMintResponse.wait();
+
+    // Balances stay the same
+    console.log('ETH Balance: ', await deployer.getBalance());
+    console.log('After WETH Balance: ', ethers.utils.formatEther(wethBalance));
+    console.log(
+      'After Token Balance: ',
+      ethers.utils.formatEther(testTokenBalance)
+    );
   });
 
   it('Process Buy Trade', async () => {});

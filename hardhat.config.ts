@@ -1,6 +1,8 @@
 import { HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-toolbox';
 import '@nomiclabs/hardhat-ethers';
+import 'hardhat-gas-reporter';
+import 'hardhat-ethernal';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -8,8 +10,22 @@ dotenv.config();
 const config: HardhatUserConfig = {
   solidity: '0.8.9',
   defaultNetwork: 'goerli',
+  // ethernal: {
+  //   uploadAst: true,
+  //   workspace: 'Abstract',
+  //   resetOnStart: 'Abstract',
+  // },
   networks: {
-    hardhat: {},
+    hardhat: {
+      chainId: 1337,
+      initialBaseFeePerGas: 0,
+      accounts: [
+        {
+          privateKey: `0x${process.env.TESTNET_PRIVATE_KEY}`,
+          balance: '10000000000000000000000', // 10000 ETH,
+        },
+      ],
+    },
     goerli: {
       url: 'https://nd-859-124-678.p2pify.com/a7da82774e6a23d13ac2d631d640a48c',
       // url:
@@ -28,6 +44,10 @@ const config: HardhatUserConfig = {
     cache: './cache',
     sources: './contracts',
     tests: './test',
+  },
+  gasReporter: {
+    enabled: true,
+    remoteContracts: [],
   },
 };
 
