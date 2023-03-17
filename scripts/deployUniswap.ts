@@ -1,19 +1,14 @@
 import { UniswapV3Deployer } from '../utils/UniswapV3Deployer';
 import { ethers } from 'hardhat';
-import { TokenFactoryDeployer } from '../utils/TokenFactoryDeployer';
+
+const WETH_ADDRESS = process.env.WETH_ADDRESS;
 
 async function main() {
   const [deployer] = await ethers.getSigners();
 
   console.log('Deploying from: ', deployer.address);
 
-  const Weth = await TokenFactoryDeployer.deploy(deployer, {
-    name: 'Wrapped Ether',
-    symbol: 'WETH',
-    supply: '1000000000',
-  });
-
-  const contracts = await UniswapV3Deployer.deploy(deployer, Weth);
+  const contracts = await UniswapV3Deployer.deploy(deployer, WETH_ADDRESS);
 
   console.info(UniswapV3Deployer.toTable(contracts));
 }

@@ -3,9 +3,7 @@ import '@nomicfoundation/hardhat-toolbox';
 import '@nomicfoundation/hardhat-chai-matchers';
 import '@nomiclabs/hardhat-ethers';
 import 'hardhat-gas-reporter';
-import 'hardhat-ethernal';
 import dotenv from 'dotenv';
-
 dotenv.config();
 
 const config: HardhatUserConfig = {
