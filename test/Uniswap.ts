@@ -2,10 +2,12 @@ import { UniswapContractArtifacts } from '../utils/UniswapV3Deployer';
 import '@nomicfoundation/hardhat-chai-matchers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { getPoolImmutables } from '../utils/poolHelpers';
+import { getPoolImmutables, poolHelpers } from '../utils/poolHelpers';
 import TokenAbi from '../artifacts/contracts/SimpleToken.sol/SimpleToken.json';
 import IUniswapV3PoolABI from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json';
-import { getAddPositionToPoolParams } from '../utils/deployUtils';
+import { Percent, Token } from '@uniswap/sdk-core';
+import { DEFAULT_TOKEN_CONFIG } from './TokenFactory';
+import { nearestUsableTick, Pool, Position } from '@uniswap/v3-sdk';
 
 describe('Uniswap', () => {
   let UniswapContracts: { [name: string]: ethers.Contract };
@@ -60,6 +62,95 @@ describe('Uniswap', () => {
     console.log('before hook setup completed');
   });
 
+  async function getAddPositionToPoolParams(pool: ethers.Contract) {
+    const [deployer] = await ethers.getSigners();
+    const poolData = await poolHelpers(pool);
+    const poolImmutables = await getPoolImmutables(pool);
+    const { tick, tickSpacing, fee, liquidity, sqrtPriceX96 } = poolData;
+    console.log('Pool Data: ', poolData);
+
+    // Construct Token instances
+    const wethToken = new Token(
+      31337,
+      poolImmutables.token0,
+      18,
+      'WETH',
+      'Wrapped Ether'
+    );
+    const testToken = new Token(
+      31337,
+      poolImmutables.token1,
+      18,
+      DEFAULT_TOKEN_CONFIG.symbol,
+      DEFAULT_TOKEN_CONFIG.name
+    );
+
+    // Initialize Pool
+    const WETH_TEST_TOKEN_POOL = new Pool(
+      wethToken,
+      testToken,
+      fee,
+      sqrtPriceX96.toString(),
+      liquidity.toString(),
+      tick
+    );
+
+    // Initialize Position
+    const position = new Position({
+      pool: WETH_TEST_TOKEN_POOL,
+      liquidity: ethers.utils.parseUnits('0.1', 18),
+      tickLower: nearestUsableTick(tick, tickSpacing) - tickSpacing * 2,
+      tickUpper: nearestUsableTick(tick, tickSpacing) + tickSpacing * 2,
+    });
+
+    const approvalAmount = ethers.utils.parseUnits('1000', 18).toString();
+
+    // Approve spending of WETH and Tokens for PositionManager before creating a position
+    await Promise.all([
+      Weth.connect(deployer).approve(
+        UniswapContracts.positionManager.address,
+        approvalAmount
+      ),
+      TestToken.connect(deployer).approve(
+        UniswapContracts.positionManager.address,
+        approvalAmount
+      ),
+    ]);
+
+    console.log('Tokens approved');
+
+    const { amount0: amount0Desired, amount1: amount1Desired } =
+      position.mintAmounts;
+    const { amount0: amount0Min, amount1: amount1Min } =
+      position.mintAmountsWithSlippage(new Percent(50, 10_000));
+
+    const params = {
+      token0: Weth.address,
+      token1: TestToken.address,
+      fee,
+      tickLower: nearestUsableTick(tick, tickSpacing) - tickSpacing * 2,
+      tickUpper: nearestUsableTick(tick, tickSpacing) + tickSpacing * 2,
+      amount0Desired: amount0Desired.toString(),
+      amount1Desired: amount1Desired.toString(),
+      amount0Min: amount0Min.toString(),
+      amount1Min: amount1Min.toString(),
+      recipient: deployer.address,
+      deadline: Math.floor(Date.now() / 1000) * 60,
+    };
+
+    console.log('Position Manager params: ', params);
+
+    return {
+      mintParams: params,
+      amount0Desired,
+      amount1Desired,
+      amount0Min,
+      amount1Min,
+      position,
+      poolData,
+    };
+  }
+
   it('Creates pool', async () => {
     const [deployer] = await ethers.getSigners();
 
@@ -88,7 +179,7 @@ describe('Uniswap', () => {
     );
 
     const { mintParams, amount0Desired, amount1Desired } =
-      await getAddPositionToPoolParams(UniswapContracts, pool);
+      await getAddPositionToPoolParams(pool);
 
     const positionMintTx = UniswapContracts.positionManager
       .connect(deployer)
@@ -121,10 +212,7 @@ describe('Uniswap', () => {
       deployer
     );
 
-    const { mintParams } = await getAddPositionToPoolParams(
-      UniswapContracts,
-      pool
-    );
+    const { mintParams } = await getAddPositionToPoolParams(pool);
 
     const positionMintTx = await UniswapContracts.positionManager
       .connect(deployer)
