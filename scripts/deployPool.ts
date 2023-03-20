@@ -2,10 +2,10 @@ import { ethers } from 'hardhat';
 import { UniswapContractArtifacts } from '../utils/UniswapV3Deployer';
 import { encodePriceSqrt } from '../utils/encodePriceSqrt';
 
-const TEST_TOKEN_ADDRESS = process.env.TEST_TOKEN_ADDRESS;
-const WETH_ADDRESS = process.env.WETH_ADDRESS;
-const UNISWAP_FACTORY_ADDRESS = process.env.UNISWAP_FACTORY_ADDRESS;
-const UNISWAP_POSITION_MANAGER_ADDRESS = process.env.UNISWAP_POSITION_MANAGER_ADDRESS;
+const TEST_TOKEN_ADDRESS = String(process.env.TEST_TOKEN_ADDRESS);
+const WETH_ADDRESS = String(process.env.WETH_ADDRESS);
+const UNISWAP_FACTORY_ADDRESS = String(process.env.UNISWAP_FACTORY_ADDRESS);
+const UNISWAP_POSITION_MANAGER_ADDRESS = String(process.env.UNISWAP_POSITION_MANAGER_ADDRESS);
 
 const poolConfig = {
   token0: WETH_ADDRESS,
@@ -28,8 +28,7 @@ async function main() {
   const existingPoolAddress = await factory
     .connect(deployer)
     .getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee);
-
-  let poolAddress, receipt;
+  let poolAddress;
 
   if (existingPoolAddress === '0x0000000000000000000000000000000000000000') {
     const tx = await positionManager
@@ -48,6 +47,7 @@ async function main() {
   }
 
   console.log('WETH/TEST_TOKEN Pool is deployed on address: ', poolAddress);
+  console.log(`WETH_TEST_TOKEN_POOL_ADDRESS=${poolAddress}`);
 }
 
 main()

@@ -1,6 +1,6 @@
-import { ethers } from 'hardhat';
+import { Contract } from 'ethers';
 
-export const poolHelpers = async (pool: ethers.Contract) => {
+export const poolHelpers = async (pool: Contract) => {
   const [tickSpacing, fee, liquidity, slot0] = await Promise.all([
     pool.tickSpacing(),
     pool.fee(),
@@ -17,7 +17,7 @@ export const poolHelpers = async (pool: ethers.Contract) => {
   };
 };
 
-export const getPoolImmutables = async (pool: ethers.Contract) => {
+export const getPoolImmutables = async (pool: Contract) => {
   const [token0, token1, fee] = await Promise.all([pool.token0(), pool.token1(), pool.fee()]);
 
   return {

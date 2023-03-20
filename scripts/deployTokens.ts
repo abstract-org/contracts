@@ -17,8 +17,9 @@ async function main() {
     })
   ]);
 
-  console.log('TestToken deployed to address: ', TestToken.address);
-  console.log('Weth deployed to address: ', Weth.address);
+  console.log('TestToken and Weth deployed. Copy-paste to .env:');
+  console.log(`TEST_TOKEN_ADDRESS=${TestToken.address}`);
+  console.log(`WETH_ADDRESS=${Weth.address}`);
 
   return {
     TestToken,

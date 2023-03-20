@@ -1,7 +1,7 @@
 import { UniswapV3Deployer } from '../utils/UniswapV3Deployer';
 import { ethers } from 'hardhat';
 
-const WETH_ADDRESS = process.env.WETH_ADDRESS;
+const WETH_ADDRESS = String(process.env.WETH_ADDRESS);
 
 async function main() {
   const [deployer] = await ethers.getSigners();

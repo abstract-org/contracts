@@ -30,29 +30,30 @@ async function main() {
     deployer
   );
 
-  const existingPoolAddress = await factory
-    .connect(deployer)
-    .getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee);
-
-  let poolAddress, receipt;
-
-  if (existingPoolAddress === '0x0000000000000000000000000000000000000000') {
-    const tx = await positionManager
-      .connect(deployer)
-      .createAndInitializePoolIfNecessary(poolConfig.token0, poolConfig.token1, poolConfig.fee, sqrtPrice, {
-        gasLimit: 10000000
-      });
-
-    await tx.wait();
-
-    poolAddress = await factory.connect(deployer).getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee, {
-      gasLimit: ethers.utils.hexlify(1000000)
-    });
-  } else {
-    poolAddress = existingPoolAddress;
-  }
-
-  console.log('WETH/TEST_TOKEN Pool is deployed on address: ', poolAddress);
+  // FIXME: duplicated code
+  // const existingPoolAddress = await factory
+  //   .connect(deployer)
+  //   .getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee);
+  // console.log('existingPoolAddress', existingPoolAddress);
+  // let poolAddress;
+  //
+  // if (existingPoolAddress === '0x0000000000000000000000000000000000000000') {
+  //   const tx = await positionManager
+  //     .connect(deployer)
+  //     .createAndInitializePoolIfNecessary(poolConfig.token0, poolConfig.token1, poolConfig.fee, sqrtPrice, {
+  //       gasLimit: 10000000
+  //     });
+  //
+  //   await tx.wait();
+  //
+  //   poolAddress = await factory.connect(deployer).getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee, {
+  //     gasLimit: ethers.utils.hexlify(1000000)
+  //   });
+  // } else {
+  //   poolAddress = existingPoolAddress;
+  // }
+  //
+  // console.log('WETH/TEST_TOKEN Pool is deployed on address: ', poolAddress);
 }
 
 main()

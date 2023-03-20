@@ -133,7 +133,7 @@ describe('Uniswap', () => {
     };
   }
 
-  it('Creates pool', async () => {
+  it('WETH-TEST pool deployed', async () => {
     const [deployer] = await ethers.getSigners();
 
     const pool = new ethers.Contract(String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS), IUniswapV3PoolABI.abi, deployer);
