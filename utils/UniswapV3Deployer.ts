@@ -16,7 +16,7 @@ export const UniswapContractArtifacts: { [name: string]: ContractJson } = {
 export class UniswapV3Deployer {
   static async deploy(
     actor: Signer,
-    Weth: Contract
+    wethAddress: string
   ): Promise<{
     factory: Contract;
     router: Contract;
@@ -28,16 +28,16 @@ export class UniswapV3Deployer {
     const deployer = new UniswapV3Deployer(actor);
 
     const factory = await deployer.deployFactory();
-    const quoter = await deployer.deployQuoter(factory.address, Weth.address);
-    const router = await deployer.deployRouter(factory.address, Weth.address);
+    const quoter = await deployer.deployQuoter(factory.address, wethAddress);
+    const router = await deployer.deployRouter(factory.address, wethAddress);
     const nftDescriptorLibrary = await deployer.deployNFTDescriptorLibrary();
     const positionDescriptor = await deployer.deployPositionDescriptor(
       nftDescriptorLibrary.address,
-      Weth.address
+      wethAddress
     );
     const positionManager = await deployer.deployNonfungiblePositionManager(
       factory.address,
-      Weth.address,
+      wethAddress,
       positionDescriptor.address
     );
 

@@ -64,7 +64,6 @@
     "@uniswap/sdk-core": "^3.2.2",
     "@uniswap/v3-periphery": "^1.4.3",
     "@uniswap/v3-sdk": "^3.9.0",
-    "hardhat-ethernal": "^3.1.0",
     "hardhat-tracer": "^2.1.2"
   }
 }
