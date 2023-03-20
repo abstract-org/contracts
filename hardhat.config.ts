@@ -21,12 +21,12 @@ const config: HardhatUserConfig = {
       accounts: [
         {
           privateKey: `0x${process.env.TESTNET_PRIVATE_KEY}`,
-          balance: '10000000000000000000000', // 10000 ETH,
-        },
-      ],
+          balance: '10000000000000000000000' // 10000 ETH,
+        }
+      ]
     },
     goerli: {
-      url: 'https://nd-859-124-678.p2pify.com/a7da82774e6a23d13ac2d631d640a48c',
+      url: 'https://nd-859-124-678.p2pify.com/a7da82774e6a23d13ac2d631d640a48c'
       // url:
       //   process.env.TESTNET_ALCHEMY_URL! + process.env.TESTNET_ALCHEMY_API_KEY!,
       // accounts: [`0x${process.env.TESTNET_PRIVATE_KEY}`],
@@ -36,18 +36,18 @@ const config: HardhatUserConfig = {
       //     process.env.TESTNET_ALCHEMY_API_KEY!,
       //   blockNumber: Number(process.env.TESTNET_BLOCK_NUM_PIN!),
       // },
-    },
+    }
   },
   paths: {
     artifacts: './artifacts',
     cache: './cache',
     sources: './contracts',
-    tests: './test',
+    tests: './test'
   },
   gasReporter: {
     enabled: true,
-    remoteContracts: [],
-  },
+    remoteContracts: []
+  }
 };
 
 export default config;

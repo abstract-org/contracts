@@ -11,7 +11,7 @@ const UNISWAP_POSITION_MANAGER_ADDRESS = '';
 const poolConfig = {
   token0: WETH_ADDRESS,
   token1: TEST_TOKEN_ADDRESS,
-  fee: 500,
+  fee: 500
 };
 
 async function main() {
@@ -39,21 +39,15 @@ async function main() {
   if (existingPoolAddress === '0x0000000000000000000000000000000000000000') {
     const tx = await positionManager
       .connect(deployer)
-      .createAndInitializePoolIfNecessary(
-        poolConfig.token0,
-        poolConfig.token1,
-        poolConfig.fee,
-        sqrtPrice,
-        { gasLimit: 10000000 }
-      );
+      .createAndInitializePoolIfNecessary(poolConfig.token0, poolConfig.token1, poolConfig.fee, sqrtPrice, {
+        gasLimit: 10000000
+      });
 
     await tx.wait();
 
-    poolAddress = await factory
-      .connect(deployer)
-      .getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee, {
-        gasLimit: ethers.utils.hexlify(1000000),
-      });
+    poolAddress = await factory.connect(deployer).getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee, {
+      gasLimit: ethers.utils.hexlify(1000000)
+    });
   } else {
     poolAddress = existingPoolAddress;
   }

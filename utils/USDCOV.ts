@@ -29,7 +29,7 @@ describe('Balance', function () {
   beforeEach(async function () {
     const _ownerAddr = '0x9894F3241F411CD2db6A3D83e374A1bF8EbfC76e';
     const USDCOVFactory = await ethers.getContractFactory('USDCOV');
-    usdcov = await USDCOVFactory.deploy(_ownerAddr);
+    usdcov = (await USDCOVFactory.deploy(_ownerAddr)) as USDCOV;
 
     [owner, alice, bob] = await ethers.getSigners();
 
@@ -51,9 +51,9 @@ describe('Balance', function () {
 
   it('should not transfer tokens if sender has insufficient balance', async function () {
     // Alice tries to transfer 1000 tokens to Bob, but she only has 900
-    await expect(
-      usdcov.transfer(bob.getAddress(), ethers.utils.parseUnits('1000', 18))
-    ).to.be.revertedWith('Invalid amount to transfer');
+    await expect(usdcov.transfer(bob.getAddress(), ethers.utils.parseUnits('1000', 18))).to.be.revertedWith(
+      'Invalid amount to transfer'
+    );
 
     // Check the balances of Alice and Bob (they should be unchanged)
     const aliceBalance = await usdcov.balanceOf(alice.getAddress());
@@ -83,9 +83,7 @@ describe('Owner', function () {
 
   it('should allow the owner to transfer tokens to any address', async function () {
     // The owner transfers 500 tokens to Alice
-    await usdcov
-      .connect(owner)
-      .transfer(alice.getAddress(), ethers.utils.parseUnits('500', 18));
+    await usdcov.connect(owner).transfer(alice.getAddress(), ethers.utils.parseUnits('500', 18));
 
     // Check the balances of Alice and the owner
     const aliceBalance = await usdcov.balanceOf(alice.getAddress());
@@ -98,9 +96,7 @@ describe('Owner', function () {
   it('should not allow a non-owner to transfer tokens', async function () {
     // Bob tries to transfer 500 tokens from the owner's account to Alice
     await expect(
-      usdcov
-        .connect(bob)
-        .transfer(alice.getAddress(), ethers.utils.parseUnits('500', 18))
+      usdcov.connect(bob).transfer(alice.getAddress(), ethers.utils.parseUnits('500', 18))
     ).to.be.revertedWith('Only the owner can perform this action');
 
     // Check the balances of Alice and the owner (they should be unchanged)
@@ -141,9 +137,9 @@ describe('Burn', function () {
 
   it('should not allow a non-owner to burn tokens', async function () {
     // Bob tries to burn 500 tokens from the owner's account
-    await expect(
-      usdcov.connect(bob).burn(ethers.utils.parseUnits('500', 18))
-    ).to.be.revertedWith('Only the owner can perform this action');
+    await expect(usdcov.connect(bob).burn(ethers.utils.parseUnits('500', 18))).to.be.revertedWith(
+      'Only the owner can perform this action'
+    );
 
     // Check the balance of the owner (it should be unchanged)
     const ownerBalance = await usdcov.balanceOf(owner.getAddress());
@@ -171,9 +167,7 @@ describe('Mint', function () {
 
   it('should allow the owner to mint new tokens', async function () {
     // The owner mints 500 new tokens to Alice
-    await usdcov
-      .connect(owner)
-      .mint(alice.getAddress(), ethers.utils.parseUnits('500', 18));
+    await usdcov.connect(owner).mint(alice.getAddress(), ethers.utils.parseUnits('500', 18));
 
     // Check the balances of Alice and the owner
     const aliceBalance = await usdcov.balanceOf(alice.getAddress());
@@ -185,11 +179,9 @@ describe('Mint', function () {
 
   it('should not allow a non-owner to mint new tokens', async function () {
     // Bob tries to mint 500 new tokens to Alice
-    await expect(
-      usdcov
-        .connect(bob)
-        .mint(alice.getAddress(), ethers.utils.parseUnits('500', 18))
-    ).to.be.revertedWith('Only the owner can perform this action');
+    await expect(usdcov.connect(bob).mint(alice.getAddress(), ethers.utils.parseUnits('500', 18))).to.be.revertedWith(
+      'Only the owner can perform this action'
+    );
 
     // Check the balances of Alice and the owner (they should be unchanged)
     const aliceBalance = await usdcov.balanceOf(alice.getAddress());

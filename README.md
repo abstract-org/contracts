@@ -37,8 +37,8 @@ https://goerlifaucet.com/
 
 # How to setup local contracts:
 
-1. ```npx hardhat run scripts/deployTokens.ts --network localhost```. Add ```TEST_TOKEN_ADDRESS``` and ```WETH_ADDRESS``` to ```.env```
-2. ```npx hardhat run scripts/deployUniswap.ts --network localhost```. Add uniswap contract addresses to ```.env```
-3. ```npx hardhat run scripts/deployPool.ts --network localhost```. Add Pool address to ```.env```
+1. `npx hardhat run scripts/deployTokens.ts --network localhost`. Add `TEST_TOKEN_ADDRESS` and `WETH_ADDRESS` to `.env`
+2. `npx hardhat run scripts/deployUniswap.ts --network localhost`. Add uniswap contract addresses to `.env`
+3. `npx hardhat run scripts/deployPool.ts --network localhost`. Add Pool address to `.env`
 
-After that you will be able to run tests with set up local environment. To run tests locally: ```npx hardhat test --network localhost```
+After that you will be able to run tests with set up local environment. To run tests locally: `npx hardhat test --network localhost`

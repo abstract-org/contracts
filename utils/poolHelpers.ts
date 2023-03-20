@@ -5,7 +5,7 @@ export const poolHelpers = async (pool: ethers.Contract) => {
     pool.tickSpacing(),
     pool.fee(),
     pool.liquidity(),
-    pool.slot0(),
+    pool.slot0()
   ]);
 
   return {
@@ -13,20 +13,16 @@ export const poolHelpers = async (pool: ethers.Contract) => {
     fee,
     liquidity,
     sqrtPriceX96: slot0[0],
-    tick: slot0[1],
+    tick: slot0[1]
   };
 };
 
 export const getPoolImmutables = async (pool: ethers.Contract) => {
-  const [token0, token1, fee] = await Promise.all([
-    pool.token0(),
-    pool.token1(),
-    pool.fee(),
-  ]);
+  const [token0, token1, fee] = await Promise.all([pool.token0(), pool.token1(), pool.fee()]);
 
   return {
     token0,
     token1,
-    fee,
+    fee
   };
 };
