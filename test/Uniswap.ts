@@ -8,53 +8,57 @@ import IUniswapV3PoolABI from '@uniswap/v3-core/artifacts/contracts/UniswapV3Poo
 import { Percent, Token } from '@uniswap/sdk-core';
 import { DEFAULT_TOKEN_CONFIG } from './TokenFactory';
 import { nearestUsableTick, Pool, Position } from '@uniswap/v3-sdk';
+import { solidity } from 'ethereum-waffle';
+import chai from 'chai';
+import { Contract } from 'ethers';
+chai.use(solidity);
 
 describe('Uniswap', () => {
-  let UniswapContracts: { [name: string]: ethers.Contract };
-  let TestToken: ethers.Contract;
-  let Weth: ethers.Contract;
+  let UniswapContracts: { [name: string]: Contract };
+  let TestToken: Contract;
+  let Weth: Contract;
 
   before(async () => {
     const [deployer] = await ethers.getSigners();
 
     TestToken = new ethers.Contract(
-      process.env.TEST_TOKEN_ADDRESS,
+      String(process.env.TEST_TOKEN_ADDRESS),
       TokenAbi.abi,
       deployer
     );
     Weth = new ethers.Contract(
-      process.env.WETH_ADDRESS,
+      String(process.env.WETH_ADDRESS),
       TokenAbi.abi,
       deployer
     );
     UniswapContracts = {
       factory: new ethers.Contract(
-        process.env.UNISWAP_FACTORY_ADDRESS,
+        String(process.env.UNISWAP_FACTORY_ADDRESS),
         UniswapContractArtifacts.UniswapV3Factory.abi,
         deployer
       ),
       router: new ethers.Contract(
-        process.env.UNISWAP_ROUTER_ADDRESS,
+        String(process.env.UNISWAP_ROUTER_ADDRESS),
         UniswapContractArtifacts.SwapRouter.abi,
         deployer
       ),
       quoter: new ethers.Contract(
-        process.env.UNISWAP_QUOTER_ADDRESS,
+        String(process.env.UNISWAP_QUOTER_ADDRESS),
         UniswapContractArtifacts.Quoter.abi,
         deployer
       ),
       nftDescriptorLibrary: new ethers.Contract(
-        process.env.UNISWAP_NFT_DESCRIPTOR_LIBRARY_ADDRESS,
+        String(process.env.UNISWAP_NFT_DESCRIPTOR_LIBRARY_ADDRESS),
         UniswapContractArtifacts.NFTDescriptor.abi,
         deployer
       ),
       positionDescriptor: new ethers.Contract(
-        process.env.UNISWAP_POSITION_DESCRIPTOR_ADDRESS,
+        String(process.env.UNISWAP_POSITION_DESCRIPTOR_ADDRESS),
         UniswapContractArtifacts.NonfungibleTokenPositionDescriptor.abi,
         deployer
       ),
       positionManager: new ethers.Contract(
-        process.env.UNISWAP_POSITION_MANAGER_ADDRESS,
+        String(process.env.UNISWAP_POSITION_MANAGER_ADDRESS),
         UniswapContractArtifacts.NonfungiblePositionManager.abi,
         deployer
       ),
@@ -62,7 +66,7 @@ describe('Uniswap', () => {
     console.log('before hook setup completed');
   });
 
-  async function getAddPositionToPoolParams(pool: ethers.Contract) {
+  async function getAddPositionToPoolParams(pool: Contract) {
     const [deployer] = await ethers.getSigners();
     const poolData = await poolHelpers(pool);
     const poolImmutables = await getPoolImmutables(pool);
@@ -155,7 +159,7 @@ describe('Uniswap', () => {
     const [deployer] = await ethers.getSigners();
 
     const pool = new ethers.Contract(
-      process.env.WETH_TEST_TOKEN_POOL_ADDRESS,
+      String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS),
       IUniswapV3PoolABI.abi,
       deployer
     );
@@ -173,7 +177,7 @@ describe('Uniswap', () => {
     const [deployer] = await ethers.getSigners();
 
     const pool = new ethers.Contract(
-      process.env.WETH_TEST_TOKEN_POOL_ADDRESS,
+      String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS),
       IUniswapV3PoolABI.abi,
       deployer
     );
@@ -207,7 +211,7 @@ describe('Uniswap', () => {
     const [deployer] = await ethers.getSigners();
 
     const pool = new ethers.Contract(
-      process.env.WETH_TEST_TOKEN_POOL_ADDRESS,
+      String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS),
       IUniswapV3PoolABI.abi,
       deployer
     );

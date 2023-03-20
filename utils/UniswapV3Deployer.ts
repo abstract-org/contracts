@@ -57,6 +57,8 @@ export class UniswapV3Deployer {
       style: { border: [] },
     });
     for (const item of Object.keys(contracts)) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       table.push([item, contracts[item].address]);
     }
 

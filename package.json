@@ -45,6 +45,7 @@
     "deploy:local": "npx hardhat run --network localhost scripts/deploySimple.ts",
     "deploy:uniswap": "npx hardhat run --network localhost scripts/deployUniswap.ts",
     "prettify": "npx prettier --write .",
+    "typecheck": "tsc --noEmit",
     "test:local": "npx hardhat test --network localhost"
   },
   "description": "1. AbstractFactory - Issues new tokens 2. Token - ERC20 Token that is a Quest",
