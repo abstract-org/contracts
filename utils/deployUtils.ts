@@ -8,6 +8,7 @@ import { getPoolImmutables, poolHelpers } from './poolHelpers';
 import { Percent, Token } from '@uniswap/sdk-core';
 import { nearestUsableTick, Pool, Position } from '@uniswap/v3-sdk';
 import TokenAbi from '../artifacts/contracts/SimpleToken.sol/SimpleToken.json';
+import { Contract } from 'ethers';
 
 export async function deployTokens() {
   const [deployer] = await ethers.getSigners();
@@ -65,7 +66,7 @@ export async function deployPool(
   return { receipt, pool };
 }
 
-export async function getAddPositionToPoolParams(UniswapContracts: any, pool: ethers.Contract) {
+export async function getAddPositionToPoolParams(UniswapContracts: any, pool: Contract) {
   const [deployer] = await ethers.getSigners();
   const poolData = await poolHelpers(pool);
   const poolImmutables = await getPoolImmutables(pool);

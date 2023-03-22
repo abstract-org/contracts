@@ -42,3 +42,8 @@ https://goerlifaucet.com/
 3. `npx hardhat run scripts/deployPool.ts --network localhost`. Add Pool address to `.env`
 
 After that you will be able to run tests with set up local environment. To run tests locally: `npx hardhat test --network localhost`
+
+# Running local tests with npm scripts:
+
+1. `npm run node:local` - start Hardhat local node
+2. `npm run test:local` - this will pre-deploy tokens / uniswap contracts / Weth-TAT pool. And will set those addressis in .env.local. The tests will be executed.
