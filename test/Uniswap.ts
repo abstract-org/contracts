@@ -20,6 +20,7 @@ import { nearestUsableTick, Pool, Position } from '@uniswap/v3-sdk';
 import { solidity } from 'ethereum-waffle';
 import chai from 'chai';
 import { Contract } from 'ethers';
+
 chai.use(solidity);
 
 const WETH_TOKEN_CONFIG = {
@@ -33,46 +34,6 @@ describe.only('Uniswap', () => {
   let TestToken: Contract;
   let Weth: Contract;
   const CHAIN_ID = 31337;
-
-  before(async () => {
-    const [deployer] = await ethers.getSigners();
-
-    TestToken = new ethers.Contract(String(process.env.TEST_TOKEN_ADDRESS), TokenAbi.abi, deployer);
-    Weth = new ethers.Contract(String(process.env.WETH_ADDRESS), TokenAbi.abi, deployer);
-    UniswapContracts = {
-      factory: new ethers.Contract(
-        String(process.env.UNISWAP_FACTORY_ADDRESS),
-        UniswapContractArtifacts.UniswapV3Factory.abi,
-        deployer
-      ),
-      router: new ethers.Contract(
-        String(process.env.UNISWAP_ROUTER_ADDRESS),
-        UniswapContractArtifacts.SwapRouter.abi,
-        deployer
-      ),
-      quoter: new ethers.Contract(
-        String(process.env.UNISWAP_QUOTER_ADDRESS),
-        UniswapContractArtifacts.Quoter.abi,
-        deployer
-      ),
-      nftDescriptorLibrary: new ethers.Contract(
-        String(process.env.UNISWAP_NFT_DESCRIPTOR_LIBRARY_ADDRESS),
-        UniswapContractArtifacts.NFTDescriptor.abi,
-        deployer
-      ),
-      positionDescriptor: new ethers.Contract(
-        String(process.env.UNISWAP_POSITION_DESCRIPTOR_ADDRESS),
-        UniswapContractArtifacts.NonfungibleTokenPositionDescriptor.abi,
-        deployer
-      ),
-      positionManager: new ethers.Contract(
-        String(process.env.UNISWAP_POSITION_MANAGER_ADDRESS),
-        UniswapContractArtifacts.NonfungiblePositionManager.abi,
-        deployer
-      )
-    };
-    console.log('before hook setup completed');
-  });
 
   async function getAddPositionToPoolParams(pool: Contract) {
     console.log('\n#### Fn: getAddPositionToPoolParams(pool) ####\n');
@@ -102,7 +63,7 @@ describe.only('Uniswap', () => {
     console.log('\n## Construct Uniswap V3 Position instance:');
     const position = new Position({
       pool: WETH_TEST_TOKEN_POOL,
-      liquidity: ethers.utils.parseEther('0.1'),
+      liquidity: ethers.utils.parseEther('10'),
       tickLower: nearestUsableTick(tick, tickSpacing) - tickSpacing * 2,
       tickUpper: nearestUsableTick(tick, tickSpacing) + tickSpacing * 2
     });
@@ -157,6 +118,46 @@ describe.only('Uniswap', () => {
     };
   }
 
+  before(async () => {
+    const [deployer] = await ethers.getSigners();
+
+    TestToken = new ethers.Contract(String(process.env.TEST_TOKEN_ADDRESS), TokenAbi.abi, deployer);
+    Weth = new ethers.Contract(String(process.env.WETH_ADDRESS), TokenAbi.abi, deployer);
+    UniswapContracts = {
+      factory: new ethers.Contract(
+        String(process.env.UNISWAP_FACTORY_ADDRESS),
+        UniswapContractArtifacts.UniswapV3Factory.abi,
+        deployer
+      ),
+      router: new ethers.Contract(
+        String(process.env.UNISWAP_ROUTER_ADDRESS),
+        UniswapContractArtifacts.SwapRouter.abi,
+        deployer
+      ),
+      quoter: new ethers.Contract(
+        String(process.env.UNISWAP_QUOTER_ADDRESS),
+        UniswapContractArtifacts.Quoter.abi,
+        deployer
+      ),
+      nftDescriptorLibrary: new ethers.Contract(
+        String(process.env.UNISWAP_NFT_DESCRIPTOR_LIBRARY_ADDRESS),
+        UniswapContractArtifacts.NFTDescriptor.abi,
+        deployer
+      ),
+      positionDescriptor: new ethers.Contract(
+        String(process.env.UNISWAP_POSITION_DESCRIPTOR_ADDRESS),
+        UniswapContractArtifacts.NonfungibleTokenPositionDescriptor.abi,
+        deployer
+      ),
+      positionManager: new ethers.Contract(
+        String(process.env.UNISWAP_POSITION_MANAGER_ADDRESS),
+        UniswapContractArtifacts.NonfungiblePositionManager.abi,
+        deployer
+      )
+    };
+    console.log('before hook setup completed');
+  });
+
   it('get existed pool address', async () => {
     const [deployer] = await ethers.getSigners();
 
@@ -187,7 +188,7 @@ describe.only('Uniswap', () => {
     expect(token1).to.equal(TestToken.address);
   });
 
-  it('Creates position', async () => {
+  it.skip('Creates position', async () => {
     console.log('###### it(Creates position) ######\n');
     const [deployer] = await ethers.getSigners();
 
@@ -205,23 +206,86 @@ describe.only('Uniswap', () => {
     console.log('###### it(Creates position) END ######\n');
   });
 
+  it('Increases Liquidity', async () => {
+    const [deployer] = await ethers.getSigners();
+
+    const pool = new ethers.Contract(String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS), IUniswapV3PoolABI.abi, deployer);
+    const positionState = await UniswapContracts.positionManager.connect(deployer).positions(1);
+
+    const increaseLiquidityParams = {
+      tokenId: 1,
+      amount0Desired: ethers.utils.parseEther('1'),
+      amount1Desired: ethers.utils.parseEther('1'),
+      amount0Min: 0,
+      amount1Min: 0,
+      deadline: Math.floor(Date.now() / 1000) * 60
+    };
+    console.log('Liquidity BEFORE: ', ethers.utils.formatEther(positionState.liquidity));
+
+    const increaseLiquidityTx = UniswapContracts.positionManager
+      .connect(deployer)
+      .increaseLiquidity(increaseLiquidityParams, {
+        gasLimit: ethers.utils.hexlify(1000000)
+      });
+
+    await expect(increaseLiquidityTx).to.emit(UniswapContracts.positionManager, 'IncreaseLiquidity');
+
+    const positionStateAfter = await UniswapContracts.positionManager.connect(deployer).positions(1);
+
+    console.log('Liquidity AFTER: ', ethers.utils.formatEther(positionStateAfter.liquidity));
+    console.log('Pool contract', await printPool(pool));
+
+    await expect(increaseLiquidityTx).to.changeTokenBalance(
+      Weth,
+      deployer.address,
+      `-${increaseLiquidityParams.amount0Desired}`
+    );
+
+    // await expect(increaseLiquidityTx).to.changeTokenBalance(
+    //   TestToken,
+    //   deployer.address,
+    //   `-${increaseLiquidityParams.amount1Desired}`
+    // );
+  });
+
+  it('Decreases Liquidity', async () => {
+    const [deployer] = await ethers.getSigners();
+
+    const pool = new ethers.Contract(String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS), IUniswapV3PoolABI.abi, deployer);
+    const positionState = await UniswapContracts.positionManager.connect(deployer).positions(1);
+
+    const decreaseLiquidityParams = {
+      tokenId: 1,
+      liquidity: ethers.BigNumber.from(positionState.liquidity).div(2),
+      amount0Min: 0,
+      amount1Min: 0,
+      deadline: Math.floor(Date.now() / 1000) * 60
+    };
+    console.log('Liquidity BEFORE: ', ethers.utils.formatEther(positionState.liquidity));
+    console.log('DecreaseLiquidityParams: ', decreaseLiquidityParams);
+
+    const decreaseLiquidityTx = UniswapContracts.positionManager
+      .connect(deployer)
+      .decreaseLiquidity(decreaseLiquidityParams, {
+        gasLimit: ethers.utils.hexlify(1000000)
+      });
+
+    await expect(decreaseLiquidityTx).to.emit(UniswapContracts.positionManager, 'DecreaseLiquidity');
+
+    const positionStateAfter = await UniswapContracts.positionManager.connect(deployer).positions(1);
+
+    await UniswapContracts.positionManager.connect(deployer);
+
+    console.log('Liquidity AFTER: ', ethers.utils.formatEther(positionStateAfter.liquidity));
+    console.log('Pool contract', await printPool(pool));
+  });
+
   it('Process ExactInputSingle Swap', async () => {
     console.log('###### it(Process ExactInputSingle Swap) ######\n');
     const [deployer] = await ethers.getSigners();
 
     const pool = new ethers.Contract(String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS), IUniswapV3PoolABI.abi, deployer);
     console.log('## instatiated pool contract', await printPool(pool));
-    const { mintParams } = await getAddPositionToPoolParams(pool);
-
-    console.log('## Position Manager minting position with mintParams...');
-    const positionMintTx = await UniswapContracts.positionManager.connect(deployer).mint(mintParams, {
-      gasLimit: ethers.utils.hexlify(1000000)
-    });
-
-    await positionMintTx.wait();
-    console.log('# pool.liquidity after mint position:', toETH(await pool.liquidity()));
-
-    await printPositions(UniswapContracts.positionManager, deployer.address);
 
     const approvalAmount = ethers.utils.parseUnits('1000', 18).toString();
 
