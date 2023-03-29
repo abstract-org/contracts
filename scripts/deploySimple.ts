@@ -12,13 +12,14 @@ async function main() {
     await SimpleTokenFactory.deploy('MyToken', 'MTK', initialSupply, deployer.address)
   );
   await simpleToken.deployed();
-  console.log('SimpleToken deployed to:', simpleToken.address);
+  console.log('## SimpleToken deployed to:', simpleToken.address);
 
   // Deploy SimpleFactory contract
   const SimpleFactoryFactory: ContractFactory = await ethers.getContractFactory('SimpleFactory');
   const simpleFactory: SimpleFactory = <SimpleFactory>await SimpleFactoryFactory.deploy();
   await simpleFactory.deployed();
-  console.log('SimpleFactory deployed to:', simpleFactory.address);
+  console.log('## SimpleTokenFactory deployed:');
+  console.log(`SIMPLE_TOKEN_FACTORY_ADDRESS=${simpleFactory.address}`);
 }
 
 main()

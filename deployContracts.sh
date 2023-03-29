@@ -9,6 +9,7 @@ echo Removing ${env_file}
 rm "${env_file}"
 
 echo -e "Deploy on network [${network}]\n"
+
 echo -n "Deploying Tokens..."
 npx hardhat run scripts/deployTokens.ts --network ${network} > "${env_file}"
 echo -e "Done.\nWait ${sleep_time} sec." && sleep $sleep_time
@@ -21,6 +22,10 @@ echo -e "Done.\nWait ${sleep_time} sec." && sleep $sleep_time
 . "${env_file}"
 echo -n "Deploying Uniswap Pool..."
 npx hardhat run scripts/deployPool.ts --network ${network} >> "${env_file}"
+echo -e "Done.\nWait ${sleep_time} sec." && sleep $sleep_time
+
+echo -n "Deploying SimpleTokenFactory..."
+npx hardhat run scripts/deploySimple.ts --network ${network} >> "${env_file}"
 echo -e "Done.\nWait ${sleep_time} sec." && sleep $sleep_time
 
 echo -e "\n[${env_file}]:"
