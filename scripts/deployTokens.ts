@@ -8,21 +8,22 @@ async function main() {
     TokenFactoryDeployer.deploy(deployer, {
       name: 'TEST_ABSTRACT_TOKEN',
       symbol: 'TAT',
-      supply: '1000000000',
+      supply: '1000000000'
     }),
     TokenFactoryDeployer.deploy(deployer, {
       name: 'Wrapped Ether',
       symbol: 'WETH',
-      supply: '1000000000',
-    }),
+      supply: '1000000000'
+    })
   ]);
 
-  console.log('TestToken deployed to address: ', TestToken.address);
-  console.log('Weth deployed to address: ', Weth.address);
+  console.log('## TestToken and Weth deployed:');
+  console.log(`TEST_TOKEN_ADDRESS=${TestToken.address}`);
+  console.log(`WETH_ADDRESS=${Weth.address}`);
 
   return {
     TestToken,
-    Weth,
+    Weth
   };
 }
 

@@ -9,10 +9,7 @@ export class TokenFactoryDeployer {
     this.deployer = deployer;
   }
 
-  static async deploy(
-    actor: Signer,
-    tokenConfig: { name: string; symbol: string; supply: string }
-  ): Promise<Contract> {
+  static async deploy(actor: Signer, tokenConfig: { name: string; symbol: string; supply: string }): Promise<Contract> {
     const tokenFactory = await ethers.getContractFactory('SimpleToken');
     const result = await tokenFactory.deploy(
       tokenConfig.name,

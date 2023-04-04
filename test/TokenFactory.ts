@@ -4,7 +4,7 @@ import { ethers } from 'hardhat';
 export const DEFAULT_TOKEN_CONFIG = {
   name: 'TEST_ABSTRACT_TOKEN',
   symbol: 'TAT',
-  supply: '1000000000',
+  supply: '1000000000'
 };
 
 describe('TokenFactory', () => {
@@ -12,10 +12,7 @@ describe('TokenFactory', () => {
 
   before(async () => {
     const [deployer] = await ethers.getSigners();
-    tokenContract = await TokenFactoryDeployer.deploy(
-      deployer,
-      DEFAULT_TOKEN_CONFIG
-    );
+    tokenContract = await TokenFactoryDeployer.deploy(deployer, DEFAULT_TOKEN_CONFIG);
   });
 
   it('Deploys successfully', async () => {});
