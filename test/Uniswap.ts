@@ -188,6 +188,7 @@ describe.only('Uniswap', () => {
     expect(token1).to.equal(TestToken.address);
   });
 
+  // it('Creates position', async () => {
   it.skip('Creates position', async () => {
     console.log('###### it(Creates position) ######\n');
     const [deployer] = await ethers.getSigners();
@@ -323,16 +324,23 @@ describe.only('Uniswap', () => {
 
     console.log('## Executing exactInputSingle with params:');
     console.log('# ', printSwapParams(swapParams));
-
-    console.info('# Pool before tx:', await printPool(pool));
+    const printedPoolBefore = await printPool(pool);
+    const poolPriceBefore = printedPoolBefore.sqrtPriceX96;
+    console.log('## BEFORE: pool.price =', poolPriceBefore);
+    console.info('\n# Pool before tx:', printedPoolBefore);
     console.log('--- pool.liquidity before Swap:', toETH(await pool.liquidity()));
-    console.log(`# expecting TestToken balance of wallet[${deployer.address}] changed by:`, quotedAmountOut);
+    console.log('\n$$ executing swap $$\n');
+    // console.log(`# expecting TestToken balance of wallet[${deployer.address}] changed by:`, toETH(quotedAmountOut));
     await expect(
       UniswapContracts.router.connect(deployer).exactInputSingle(swapParams, {
         gasLimit: ethers.utils.hexlify(5000000)
       })
     ).to.changeTokenBalance(TestToken, deployer.address, `${quotedAmountOut}`);
-    console.info('# Pool before tx:', await printPool(pool));
+    const printedPoolAfter = await printPool(pool);
+    const poolPriceAfter = printedPoolAfter.sqrtPriceX96;
+    console.log('## AFTER: pool.price =', poolPriceAfter);
+    console.log('## price diff: before-after=', poolPriceBefore - poolPriceAfter);
+    console.info('\n# Pool after tx:', printedPoolAfter);
     console.log('--- pool.liquidity after swap:', toETH(await pool.liquidity()));
     await printPositions(UniswapContracts.positionManager, deployer.address);
     console.log('###### it(Process ExactInputSingle Swap) END ######\n');
