@@ -7,6 +7,8 @@ import '@nomiclabs/hardhat-etherscan';
 import dotenv from 'dotenv';
 import { RemoteContract } from 'hardhat-gas-reporter/dist/src/types';
 dotenv.config();
+dotenv.config({ path: '.env.local' });
+
 type ContractJson = { abi: any; bytecode: string };
 const UniswapContractArtifacts: { [name: string]: ContractJson } = {
   Quoter: require('@uniswap/v3-periphery/artifacts/contracts/lens/Quoter.sol/Quoter.json'),
@@ -29,6 +31,7 @@ const getRemoteContract = (contractName: string, envName: string) => {
         }
       ];
 };
+
 const remoteContracts: RemoteContract[] = [
   ...getRemoteContract('UniswapV3Factory', 'UNISWAP_FACTORY_ADDRESS'),
   ...getRemoteContract('SwapRouter', 'UNISWAP_ROUTER_ADDRESS'),

@@ -2,14 +2,14 @@ import { ethers } from 'hardhat';
 import { UniswapContractArtifacts } from '../utils/UniswapV3Deployer';
 import { encodePriceSqrt } from '../utils/encodePriceSqrt';
 
-const WETH_ADDRESS = String(process.env.WETH_ADDRESS);
-const TEST_TOKEN_ADDRESS = String(process.env.TEST_TOKEN_ADDRESS);
+const TOKEN_A_ADDRESS = String(process.env.TOKEN_A_ADDRESS);
+const TOKEN_B_ADDRESS = String(process.env.TOKEN_B_ADDRESS);
 const UNISWAP_FACTORY_ADDRESS = String(process.env.UNISWAP_FACTORY_ADDRESS);
 const UNISWAP_POSITION_MANAGER_ADDRESS = String(process.env.UNISWAP_POSITION_MANAGER_ADDRESS);
 
 const poolConfig = {
-  token0: WETH_ADDRESS,
-  token1: TEST_TOKEN_ADDRESS,
+  token0: TOKEN_A_ADDRESS,
+  token1: TOKEN_B_ADDRESS,
   fee: 500
 };
 
@@ -46,8 +46,8 @@ async function main() {
     poolAddress = existingPoolAddress;
   }
 
-  console.log('## WETH/TEST_TOKEN Pool deployed:');
-  console.log(`WETH_TEST_TOKEN_POOL_ADDRESS=${poolAddress}`);
+  console.log('## Cross Pool A-B deployed:');
+  console.log(`POOL_A_B_ADDRESS=${poolAddress}`);
 }
 
 main()
