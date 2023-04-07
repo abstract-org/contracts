@@ -46,4 +46,11 @@ After that you will be able to run tests with set up local environment. To run t
 # Running local tests with npm scripts:
 
 1. `npm run node:local` - start Hardhat local node
-2. `npm run test:local` - this will pre-deploy tokens / uniswap contracts / Weth-TAT pool. And will set those addressis in .env.local. The tests will be executed.
+2. `npm run deploy:local -- --all` -this will pre-deploy tokens, Uniswap contracts, Weth-TAT and A-B pools
+And this will set those addresses in .env.local.
+3. `npm run test:local` - hardhat will execute tests using already created .env.local file in it's config
+
+**P.S.** 
+If you do not want to deploy pools. Eg you gonna deploy them in external tests. 
+Then deploy command should be simply:
+`npm run deploy:local`
