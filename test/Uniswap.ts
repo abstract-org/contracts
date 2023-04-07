@@ -189,7 +189,7 @@ describe.only('Uniswap', () => {
   });
 
   // it('Creates position', async () => {
-  it.skip('Creates position', async () => {
+  it('Creates position', async () => {
     console.log('###### it(Creates position) ######\n');
     const [deployer] = await ethers.getSigners();
 

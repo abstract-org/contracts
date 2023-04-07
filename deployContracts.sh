@@ -3,7 +3,7 @@
 #SCRIPT_DIR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 env_file=./.env.local
-network=${1:-localhost}
+network=localhost
 sleep_time=1
 execute_all=false
 
@@ -45,7 +45,6 @@ echo -e "Deploy on network [${network}]\n"
 echo -e "## [${env_file}]\n" > "${env_file}"
 
 echo -n "Deploying Tokens..."
-
 npx hardhat run scripts/deployTokens.ts --network ${network} >> "${env_file}"
 echo -e "Done.\nWait ${sleep_time} sec." && sleep $sleep_time
 
