@@ -38,10 +38,9 @@ export const printPool = async (pool: Contract) => {
     token1: printToken(immutables.token1),
     fee: immutables.fee,
     tickSpacing: state.tickSpacing,
-    liquidity: state.liquidity,
-    sqrtPriceX96: state.sqrtPriceX96,
-    tick: state.tick,
-    slot0: await pool.slot0()
+    liquidity: toETH(state.liquidity),
+    sqrtPriceX96: Math.sqrt(state.sqrtPriceX96 / 2 ** 96),
+    tick: state.tick
   };
 };
 
@@ -61,7 +60,7 @@ export const printUniswapV3Pool = (pool: Pool) => {
   };
 };
 
-export const toETH = (wei: string) => ethers.utils.commify(ethers.utils.formatEther(wei)) + 'ETH';
+export const toETH = (wei: string) => ethers.utils.commify(ethers.utils.formatEther(wei));
 
 export async function getPositionIds(positionContract: Contract, ownerAddress: string): Promise<number[]> {
   if (!ownerAddress) {
@@ -117,7 +116,7 @@ export const printSwapParams = (swapParams: any) => ({
   deadline: swapParams.deadline,
   amountIn: toETH(swapParams.amountIn),
   amountOutMinimum: toETH(swapParams.amountOutMinimum),
-  sqrtPriceLimitX96: swapParams.sqrtPriceLimitX96
+  sqrtPriceLimitX96: toETH(swapParams.sqrtPriceLimitX96)
 });
 
 export const printPositions = async (positionManagerContract: Contract, ownerAddress: string) => {
