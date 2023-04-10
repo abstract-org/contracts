@@ -57,11 +57,15 @@ npx hardhat run scripts/deploySimple.ts --network ${network} >> "${env_file}"
 echo -e "Done.\nWait $long sec." && sleep $long
 
 if $execute_all; then
+  echo -en "\nDeploying Uniswap Pools WETH-A and WETH-B..."
+  npx hardhat run scripts/deployWethPools.ts --network ${network} >> "${env_file}"
+  echo -e "Done.\nWait $long sec." && sleep $long
+
   echo -en "\nDeploying Uniswap CrossPool A-B..."
   npx hardhat run scripts/deployCrossPool.ts --network ${network} >> "${env_file}"
   echo -e "Done.\nWait $long sec." && sleep $long
 
-  echo -en "\nDeploying Uniswap Pool..."
+  echo -en "\nDeploying Uniswap Pool WETH-TEST..."
   npx hardhat run scripts/deployPool.ts --network ${network} >> "${env_file}"
   echo -e "Done.\nWait $long sec." && sleep $long
 fi

@@ -46,7 +46,7 @@ async function main() {
     poolAddress = existingPoolAddress;
   }
 
-  console.log('## WETH/TEST_TOKEN Pool deployed:');
+  console.log('\n## Pool WETH-TEST deployed:');
   console.log(`WETH_TEST_TOKEN_POOL_ADDRESS=${poolAddress}`);
 }
 

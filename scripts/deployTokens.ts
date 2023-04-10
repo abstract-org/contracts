@@ -15,7 +15,7 @@ async function main() {
     supply: '1000000000'
   });
 
-  console.log('## TestToken and Weth deployed:');
+  console.log('## Tokens WETH and TEST deployed:');
   console.log(`WETH_ADDRESS=${Weth.address}`);
   console.log(`TEST_TOKEN_ADDRESS=${TestToken.address}`);
 

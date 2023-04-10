@@ -48,17 +48,18 @@ async function main() {
   const SimpleFactoryFactory: ContractFactory = await ethers.getContractFactory('SimpleFactory');
   const simpleFactory: SimpleFactory = <SimpleFactory>await SimpleFactoryFactory.deploy();
   await simpleFactory.deployed();
-  console.log('## SimpleTokenFactory deployed:');
+  console.log('\n## SimpleTokenFactory deployed:');
   console.log(`SIMPLE_TOKEN_FACTORY_ADDRESS=${simpleFactory.address}`);
 
   const addressTokenA = await createToken(simpleFactory, initialSupply, deployer, {
     name: 'A'
   });
-  console.log(`TOKEN_A_ADDRESS=${addressTokenA}`);
-
   const addressTokenB = await createToken(simpleFactory, initialSupply, deployer, {
     name: 'B'
   });
+
+  console.log('\n## Tokens A and B deployed:');
+  console.log(`TOKEN_A_ADDRESS=${addressTokenA}`);
   console.log(`TOKEN_B_ADDRESS=${addressTokenB}`);
 }
 
