@@ -312,20 +312,7 @@ describe.only('Uniswap', () => {
     console.log('Pool contract', await printPool(pool));
   });
 
-  it('Opens another Position', async () => {
-    const [deployer] = await ethers.getSigners();
-
-    const pool = new ethers.Contract(String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS), IUniswapV3PoolABI.abi, deployer);
-    const positionState = await UniswapContracts.positionManager.connect(deployer).positions(1);
-
-    const { mintParams, amount0Desired, amount1Desired } = await getAddPositionToPoolParams(pool);
-    console.log('## Position Manager minting position with mintParams...');
-    const positionMintTx = UniswapContracts.positionManager.connect(deployer).mint(mintParams, {
-      gasLimit: ethers.utils.hexlify(1000000)
-    });
-  });
-
-  it.skip('Process ExactInputSingle Swap', async () => {
+  it('Process ExactInputSingle Swap', async () => {
     console.log('###### it(Process ExactInputSingle Swap) ######\n');
     const [deployer] = await ethers.getSigners();
 
