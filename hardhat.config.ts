@@ -9,6 +9,8 @@ import { RemoteContract } from 'hardhat-gas-reporter/dist/src/types';
 dotenv.config();
 dotenv.config({ path: '.env.local' });
 
+import { privateKey } from './secrets.json';
+
 type ContractJson = { abi: any; bytecode: string };
 const UniswapContractArtifacts: { [name: string]: ContractJson } = {
   Quoter: require('@uniswap/v3-periphery/artifacts/contracts/lens/Quoter.sol/Quoter.json'),
@@ -42,7 +44,7 @@ const remoteContracts: RemoteContract[] = [
 ];
 const config: HardhatUserConfig = {
   solidity: '0.8.9',
-  defaultNetwork: 'goerli',
+  defaultNetwork: 'ov',
   // ethernal: {
   //   uploadAst: true,
   //   workspace: 'Abstract',
@@ -64,17 +66,11 @@ const config: HardhatUserConfig = {
         }
       ]
     },
-    goerli: {
-      url: 'https://nd-859-124-678.p2pify.com/a7da82774e6a23d13ac2d631d640a48c'
-      // url:
-      //   process.env.TESTNET_ALCHEMY_URL! + process.env.TESTNET_ALCHEMY_API_KEY!,
-      // accounts: [`0x${process.env.TESTNET_PRIVATE_KEY}`],
-      // forking: {
-      //   url:
-      //     process.env.TESTNET_ALCHEMY_URL! +
-      //     process.env.TESTNET_ALCHEMY_API_KEY!,
-      //   blockNumber: Number(process.env.TESTNET_BLOCK_NUM_PIN!),
-      // },
+    ov: {
+      url: 'http://3.74.234.206:8077',
+      chainId: 42,
+      accounts: [privateKey],
+      gasPrice: 20000000000 // 20 Gwei
     }
   },
   paths: {

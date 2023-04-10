@@ -19,3 +19,4 @@ blockscout/docker-compose/services/redis-data
 
 # addresses generated after each deployContracts
 .env.local
+secrets.json
