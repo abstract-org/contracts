@@ -188,8 +188,7 @@ describe.only('Uniswap', () => {
     expect(token1).to.equal(TestToken.address);
   });
 
-  it.skip('Creates position', async () => {
-    console.log('###### it(Creates position) ######\n');
+  it.skip('Opens Initial Single-Sided Liquidity', async () => {
     const [deployer] = await ethers.getSigners();
 
     const pool = new ethers.Contract(String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS), IUniswapV3PoolABI.abi, deployer);
@@ -206,7 +205,40 @@ describe.only('Uniswap', () => {
     console.log('###### it(Creates position) END ######\n');
   });
 
-  it('Increases Liquidity', async () => {
+  it('Creates Default Position if none exists', async () => {
+    const [deployer] = await ethers.getSigners();
+
+    try {
+      console.log('###### it(Creates position) ######\n');
+
+      const positionState = await UniswapContracts.positionManager.connect(deployer).positions(1);
+
+      console.log('Existing Position: ', positionState);
+
+      if (positionState) {
+        return true;
+      }
+    } catch (e) {
+      const pool = new ethers.Contract(
+        String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS),
+        IUniswapV3PoolABI.abi,
+        deployer
+      );
+
+      const { mintParams, amount0Desired, amount1Desired } = await getAddPositionToPoolParams(pool);
+      console.log('## Position Manager minting position with mintParams...');
+      const positionMintTx = UniswapContracts.positionManager.connect(deployer).mint(mintParams, {
+        gasLimit: ethers.utils.hexlify(1000000)
+      });
+
+      await expect(positionMintTx).to.emit(UniswapContracts.positionManager, 'IncreaseLiquidity');
+      await expect(positionMintTx).to.changeTokenBalance(Weth, deployer.address, `-${amount0Desired}`);
+      await expect(positionMintTx).to.changeTokenBalance(TestToken, deployer.address, `-${amount1Desired}`);
+      console.log('###### it(Creates position) END ######\n');
+    }
+  });
+
+  it('Increases Liquidity of Initial Position', async () => {
     const [deployer] = await ethers.getSigners();
 
     const pool = new ethers.Contract(String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS), IUniswapV3PoolABI.abi, deployer);
@@ -248,7 +280,7 @@ describe.only('Uniswap', () => {
     // );
   });
 
-  it('Decreases Liquidity', async () => {
+  it('Decreases Liquidity of Initial Position', async () => {
     const [deployer] = await ethers.getSigners();
 
     const pool = new ethers.Contract(String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS), IUniswapV3PoolABI.abi, deployer);
@@ -280,7 +312,20 @@ describe.only('Uniswap', () => {
     console.log('Pool contract', await printPool(pool));
   });
 
-  it('Process ExactInputSingle Swap', async () => {
+  it('Opens another Position', async () => {
+    const [deployer] = await ethers.getSigners();
+
+    const pool = new ethers.Contract(String(process.env.WETH_TEST_TOKEN_POOL_ADDRESS), IUniswapV3PoolABI.abi, deployer);
+    const positionState = await UniswapContracts.positionManager.connect(deployer).positions(1);
+
+    const { mintParams, amount0Desired, amount1Desired } = await getAddPositionToPoolParams(pool);
+    console.log('## Position Manager minting position with mintParams...');
+    const positionMintTx = UniswapContracts.positionManager.connect(deployer).mint(mintParams, {
+      gasLimit: ethers.utils.hexlify(1000000)
+    });
+  });
+
+  it.skip('Process ExactInputSingle Swap', async () => {
     console.log('###### it(Process ExactInputSingle Swap) ######\n');
     const [deployer] = await ethers.getSigners();
 
