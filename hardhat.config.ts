@@ -52,6 +52,11 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 1337,
       initialBaseFeePerGas: 0,
+      mining: {
+        mempool: {
+          order: 'fifo'
+        }
+      },
       accounts: [
         {
           privateKey: `0x${process.env.TESTNET_PRIVATE_KEY}`,
