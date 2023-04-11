@@ -25,17 +25,27 @@ async function main() {
     deployer
   );
 
-  const existingPoolAddress = await factory
-    .connect(deployer)
-    .getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee);
+  let existingPoolAddress;
   let poolAddress;
+  try {
+    existingPoolAddress = await factory.connect(deployer).getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee);
+  } catch (e) {
+    console.log("Didn't find the pool, will create a new one");
+  }
 
-  if (existingPoolAddress === '0x0000000000000000000000000000000000000000') {
+  if (!existingPoolAddress || existingPoolAddress === '0x0000000000000000000000000000000000000000') {
     const tx = await positionManager
       .connect(deployer)
-      .createAndInitializePoolIfNecessary(poolConfig.token0, poolConfig.token1, poolConfig.fee, sqrtPrice, {
-        gasLimit: 10000000
-      });
+      .createAndInitializePoolIfNecessary(
+        poolConfig.token0,
+        poolConfig.token1,
+        poolConfig.fee,
+        ethers.utils.parseEther('1'),
+        {
+          gasLimit: 1000000,
+          gasPrice: 20000000000
+        }
+      );
 
     await tx.wait();
 

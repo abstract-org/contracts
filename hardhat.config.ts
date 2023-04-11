@@ -1,3 +1,4 @@
+import { ethers } from 'hardhat';
 import { HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-toolbox';
 import '@nomicfoundation/hardhat-chai-matchers';
@@ -42,6 +43,7 @@ const remoteContracts: RemoteContract[] = [
   ...getRemoteContract('NonfungibleTokenPositionDescriptor', 'UNISWAP_POSITION_DESCRIPTOR_ADDRESS'),
   ...getRemoteContract('NonfungiblePositionManager', 'UNISWAP_POSITION_MANAGER_ADDRESS')
 ];
+
 const config: HardhatUserConfig = {
   solidity: '0.8.9',
   defaultNetwork: 'ov',
@@ -70,7 +72,8 @@ const config: HardhatUserConfig = {
       url: 'http://3.74.234.206:8077',
       chainId: 42,
       accounts: [privateKey],
-      gasPrice: 20000000000 // 20 Gwei
+      gas: 1000000,
+      gasPrice: 20000000000
     }
   },
   paths: {
