@@ -2,6 +2,7 @@ import { ethers } from 'hardhat';
 import { UniswapContractArtifacts } from '../utils/UniswapV3Deployer';
 import { encodePriceSqrt } from '../utils/encodePriceSqrt';
 import { getOrDeployPool, PoolConfig } from '../utils/getOrDeployPool';
+import { FeeAmount } from '@uniswap/v3-sdk';
 
 const WETH_ADDRESS = String(process.env.WETH_ADDRESS);
 const TOKEN_A_ADDRESS = String(process.env.TOKEN_A_ADDRESS);
@@ -12,13 +13,13 @@ const UNISWAP_POSITION_MANAGER_ADDRESS = String(process.env.UNISWAP_POSITION_MAN
 const poolAConfig = {
   token0: WETH_ADDRESS,
   token1: TOKEN_A_ADDRESS,
-  fee: 500
+  fee: FeeAmount.LOW
 };
 
 const poolBConfig: PoolConfig = {
   token0: WETH_ADDRESS,
   token1: TOKEN_B_ADDRESS,
-  fee: 500
+  fee: FeeAmount.LOW
 };
 
 async function main() {

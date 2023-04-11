@@ -15,13 +15,18 @@ import {
 import TokenAbi from '../artifacts/contracts/SimpleToken.sol/SimpleToken.json';
 import IUniswapV3PoolABI from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json';
 import { Percent, Token } from '@uniswap/sdk-core';
-import { DEFAULT_TOKEN_CONFIG } from './TokenFactory';
 import { nearestUsableTick, Pool, Position } from '@uniswap/v3-sdk';
 import { solidity } from 'ethereum-waffle';
 import chai from 'chai';
 import { Contract } from 'ethers';
 
 chai.use(solidity);
+
+const DEFAULT_TOKEN_CONFIG = {
+  name: 'TEST_ABSTRACT_TOKEN',
+  symbol: 'TAT',
+  supply: '1000000000'
+};
 
 const WETH_TOKEN_CONFIG = {
   name: 'Wrapped Ether',
@@ -63,6 +68,7 @@ describe.only('Uniswap', () => {
     console.log('\n## Construct Uniswap V3 Position instance:');
     const position = new Position({
       pool: WETH_TEST_TOKEN_POOL,
+      // @ts-ignore
       liquidity: ethers.utils.parseEther('10'),
       tickLower: nearestUsableTick(tick, tickSpacing) - tickSpacing * 2,
       tickUpper: nearestUsableTick(tick, tickSpacing) + tickSpacing * 2

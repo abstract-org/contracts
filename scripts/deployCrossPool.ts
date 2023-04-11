@@ -3,18 +3,17 @@ import { UniswapContractArtifacts } from '../utils/UniswapV3Deployer';
 import { encodePriceSqrt } from '../utils/encodePriceSqrt';
 import { getOrDeployPool } from '../utils/getOrDeployPool';
 import { calcCrossPoolPrice } from '../utils/calcCrossPoolPrice';
+import { FeeAmount } from '@uniswap/v3-sdk';
 
 const TOKEN_A_ADDRESS = String(process.env.TOKEN_A_ADDRESS);
 const TOKEN_B_ADDRESS = String(process.env.TOKEN_B_ADDRESS);
-const POOL_WETH_A_ADDRESS = String(process.env.POOL_WETH_A_ADDRESS);
-const POOL_WETH_B_ADDRESS = String(process.env.POOL_WETH_B_ADDRESS);
 const UNISWAP_FACTORY_ADDRESS = String(process.env.UNISWAP_FACTORY_ADDRESS);
 const UNISWAP_POSITION_MANAGER_ADDRESS = String(process.env.UNISWAP_POSITION_MANAGER_ADDRESS);
 
 const poolConfig = {
   token0: TOKEN_A_ADDRESS,
   token1: TOKEN_B_ADDRESS,
-  fee: 500
+  fee: FeeAmount.LOW
 };
 
 async function main() {

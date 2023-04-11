@@ -83,6 +83,7 @@ export async function getAddPositionToPoolParams(UniswapContracts: any, pool: Co
   // Initialize Position
   const position = new Position({
     pool: WETH_TEST_TOKEN_POOL,
+    // @ts-ignore
     liquidity: ethers.utils.parseUnits('0.1', 18),
     tickLower: nearestUsableTick(tick, tickSpacing) - tickSpacing * 2,
     tickUpper: nearestUsableTick(tick, tickSpacing) + tickSpacing * 2

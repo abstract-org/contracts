@@ -9,7 +9,7 @@ describe('Supply', function () {
   beforeEach(async function () {
     const _ownerAddr = '0x9894F3241F411CD2db6A3D83e374A1bF8EbfC76e';
     const USDCOVFactory = await ethers.getContractFactory('USDCOV');
-    usdcov = await USDCOVFactory.deploy(_ownerAddr);
+    usdcov = <USDCOV>await USDCOVFactory.deploy(_ownerAddr);
   });
 
   it('should have the correct total supply', async function () {
@@ -73,7 +73,7 @@ describe('Owner', function () {
   beforeEach(async function () {
     const _ownerAddr = '0x9894F3241F411CD2db6A3D83e374A1bF8EbfC76e';
     const USDCOVFactory = await ethers.getContractFactory('USDCOV');
-    usdcov = await USDCOVFactory.deploy(_ownerAddr);
+    usdcov = <USDCOV>await USDCOVFactory.deploy(_ownerAddr);
 
     [owner, alice, bob] = await ethers.getSigners();
 
@@ -117,7 +117,7 @@ describe('Burn', function () {
   beforeEach(async function () {
     const _ownerAddr = '0x9894F3241F411CD2db6A3D83e374A1bF8EbfC76e';
     const USDCOVFactory = await ethers.getContractFactory('USDCOV');
-    usdcov = await USDCOVFactory.deploy(_ownerAddr);
+    usdcov = <USDCOV>await USDCOVFactory.deploy(_ownerAddr);
 
     [owner, alice, bob] = await ethers.getSigners();
 
@@ -157,7 +157,7 @@ describe('Mint', function () {
   beforeEach(async function () {
     const _ownerAddr = '0x9894F3241F411CD2db6A3D83e374A1bF8EbfC76e';
     const USDCOVFactory = await ethers.getContractFactory('USDCOV');
-    usdcov = await USDCOVFactory.deploy(_ownerAddr);
+    usdcov = <USDCOV>await USDCOVFactory.deploy(_ownerAddr);
 
     [owner, alice, bob] = await ethers.getSigners();
 

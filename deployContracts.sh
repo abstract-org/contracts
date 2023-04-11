@@ -37,37 +37,38 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+
+HardhatRun() {
+    local scriptPath="$1"
+    local description=${2:-"Running $1"}
+    local sleepTime=${3:-$short}
+    if [[ ! -f "$scriptPath" ]]; then
+        echo -e "\nScript not found: $scriptPath \n"
+        return 1
+    fi
+    echo -en "\n${description}..."
+    npx hardhat run "${scriptPath}" --network ${network} >> "${env_file}"
+    echo -e "Done.\nWait $sleepTime sec." && sleep $sleepTime
+}
+
 echo Removing ${env_file}
 rm "${env_file}"
 
 echo -e "\nDeploying on network: [${network}]\n"
+echo -e "## [${env_file}]" > "${env_file}"
 
-echo -e "## [${env_file}]\n" > "${env_file}"
+# the order of execution is important for those 3 deploys:
+HardhatRun scripts/deploySimpleFactory.ts "Deploying SimpleTokenFactory" $long
+HardhatRun scripts/deployWethToken.ts "Deploying WETH Token"
+HardhatRun scripts/deployUniswap.ts "Deploying Uniswap contracts" $long
 
-echo -en "\nDeploying Tokens..."
-npx hardhat run scripts/deployTokens.ts --network ${network} >> "${env_file}"
-echo -e "Done.\nWait ${short} sec." && sleep $short
-
-echo -en "\nDeploying Uniswap contracts..."
-npx hardhat run scripts/deployUniswap.ts --network ${network} >> "${env_file}"
-echo -e "Done.\nWait $short sec." && sleep $short
-
-echo -en "\nDeploying SimpleTokenFactory..."
-npx hardhat run scripts/deploySimple.ts --network ${network} >> "${env_file}"
-echo -e "Done.\nWait $long sec." && sleep $long
+HardhatRun scripts/deployTestToken.ts "Deploying TEST Token"
+HardhatRun scripts/deploySimpleTokens.ts "Deploying Simple Tokens A and B"
 
 if $execute_all; then
-  echo -en "\nDeploying Uniswap Pools WETH-A and WETH-B..."
-  npx hardhat run scripts/deployWethPools.ts --network ${network} >> "${env_file}"
-  echo -e "Done.\nWait $long sec." && sleep $long
-
-  echo -en "\nDeploying Uniswap CrossPool A-B..."
-  npx hardhat run scripts/deployCrossPool.ts --network ${network} >> "${env_file}"
-  echo -e "Done.\nWait $long sec." && sleep $long
-
-  echo -en "\nDeploying Uniswap Pool WETH-TEST..."
-  npx hardhat run scripts/deployPool.ts --network ${network} >> "${env_file}"
-  echo -e "Done.\nWait $long sec." && sleep $long
+  HardhatRun scripts/deployWethPools.ts "Deploying Pools WETH-A and WETH-B" $long
+  HardhatRun scripts/deployCrossPool.ts "Deploying CrossPool A-B" $long
+  HardhatRun scripts/deployTestPool.ts "Deploying Pool WETH-TEST" $long
 fi
 
 echo -e "\n[${env_file}]:"
