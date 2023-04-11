@@ -3,8 +3,9 @@
 #SCRIPT_DIR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 env_file=./.env.local
-network=${1:-localhost}
-sleep_time=1
+network=localhost
+short=1
+long=5
 execute_all=false
 
 print_help() {
@@ -13,26 +14,25 @@ print_help() {
   echo -e "  deployContracts.sh --network {hardhat network name}\n    - this will exec deploys on predefined Hardhat network from hardhat.config.ts\n"
 }
 
-for arg in "$@"
-do
-    case $arg in
+while [[ $# -gt 0 ]]; do
+    case "$1" in
         --all)
             execute_all=true
             shift
             ;;
         --network)
-            network="$2"
-            shift 2
-            ;;
-        --help)
-            print_help
-            exit 0
+            if [ -n "$2" ] && [[ ! $2 =~ ^-- ]]; then
+                network="$2"
+                shift
+            else
+                echo "Error: argument --network should have value: name of network"
+                exit 1
+            fi
+            shift
             ;;
         *)
-            echo "Unknown argument: $arg"
-            echo ""
-            print_help
-            exit 1
+            echo "Error: unknown argument [$1]"
+            shift
             ;;
     esac
 done
@@ -40,31 +40,34 @@ done
 echo Removing ${env_file}
 rm "${env_file}"
 
-echo -e "Deploy on network [${network}]\n"
+echo -e "\nDeploying on network: [${network}]\n"
 
 echo -e "## [${env_file}]\n" > "${env_file}"
 
-echo -n "Deploying Tokens..."
-
+echo -en "\nDeploying Tokens..."
 npx hardhat run scripts/deployTokens.ts --network ${network} >> "${env_file}"
-echo -e "Done.\nWait ${sleep_time} sec." && sleep $sleep_time
+echo -e "Done.\nWait ${short} sec." && sleep $short
 
-echo -n "Deploying Uniswap contracts..."
+echo -en "\nDeploying Uniswap contracts..."
 npx hardhat run scripts/deployUniswap.ts --network ${network} >> "${env_file}"
-echo -e "Done.\nWait 5 sec." && sleep 5
+echo -e "Done.\nWait $short sec." && sleep $short
 
-echo -n "Deploying SimpleTokenFactory..."
+echo -en "\nDeploying SimpleTokenFactory..."
 npx hardhat run scripts/deploySimple.ts --network ${network} >> "${env_file}"
-echo -e "Done.\nWait 5 sec." && sleep 5
+echo -e "Done.\nWait $long sec." && sleep $long
 
 if $execute_all; then
-  echo -n "Deploying Uniswap CrossPool A-B..."
-  npx hardhat run scripts/deployCrossPool.ts --network ${network} >> "${env_file}"
-  echo -e "Done.\nWait ${sleep_time} sec." && sleep $sleep_time
+  echo -en "\nDeploying Uniswap Pools WETH-A and WETH-B..."
+  npx hardhat run scripts/deployWethPools.ts --network ${network} >> "${env_file}"
+  echo -e "Done.\nWait $long sec." && sleep $long
 
-  echo -n "Deploying Uniswap Pool..."
+  echo -en "\nDeploying Uniswap CrossPool A-B..."
+  npx hardhat run scripts/deployCrossPool.ts --network ${network} >> "${env_file}"
+  echo -e "Done.\nWait $long sec." && sleep $long
+
+  echo -en "\nDeploying Uniswap Pool WETH-TEST..."
   npx hardhat run scripts/deployPool.ts --network ${network} >> "${env_file}"
-  echo -e "Done.\nWait ${sleep_time} sec." && sleep $sleep_time
+  echo -e "Done.\nWait $long sec." && sleep $long
 fi
 
 echo -e "\n[${env_file}]:"

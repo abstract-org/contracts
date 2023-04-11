@@ -1,18 +1,22 @@
 import { ethers } from 'hardhat';
 import { UniswapContractArtifacts } from '../utils/UniswapV3Deployer';
 import { encodePriceSqrt } from '../utils/encodePriceSqrt';
-import { getOrDeployPool } from '../utils/getOrDeployPool';
-import { calcCrossPoolPrice } from '../utils/calcCrossPoolPrice';
+import { getOrDeployPool, PoolConfig } from '../utils/getOrDeployPool';
 
+const WETH_ADDRESS = String(process.env.WETH_ADDRESS);
 const TOKEN_A_ADDRESS = String(process.env.TOKEN_A_ADDRESS);
 const TOKEN_B_ADDRESS = String(process.env.TOKEN_B_ADDRESS);
-const POOL_WETH_A_ADDRESS = String(process.env.POOL_WETH_A_ADDRESS);
-const POOL_WETH_B_ADDRESS = String(process.env.POOL_WETH_B_ADDRESS);
 const UNISWAP_FACTORY_ADDRESS = String(process.env.UNISWAP_FACTORY_ADDRESS);
 const UNISWAP_POSITION_MANAGER_ADDRESS = String(process.env.UNISWAP_POSITION_MANAGER_ADDRESS);
 
-const poolConfig = {
-  token0: TOKEN_A_ADDRESS,
+const poolAConfig = {
+  token0: WETH_ADDRESS,
+  token1: TOKEN_A_ADDRESS,
+  fee: 500
+};
+
+const poolBConfig: PoolConfig = {
+  token0: WETH_ADDRESS,
   token1: TOKEN_B_ADDRESS,
   fee: 500
 };
@@ -27,12 +31,12 @@ async function main() {
   );
 
   const sqrtPrice = encodePriceSqrt(1, 1);
-  // const sqrtPrice = await calcCrossPoolPrice(POOL_WETH_A_ADDRESS, POOL_WETH_B_ADDRESS, deployer)
+  const poolAddressWethA = await getOrDeployPool(sqrtPrice, poolAConfig, { factory, deployer, positionManager });
+  const poolAddressWethB = await getOrDeployPool(sqrtPrice, poolBConfig, { factory, deployer, positionManager });
 
-  const poolAddress = await getOrDeployPool(sqrtPrice, poolConfig, { deployer, factory, positionManager });
-
-  console.log('\n## Cross Pool A-B deployed:');
-  console.log(`POOL_A_B_ADDRESS=${poolAddress}`);
+  console.log('\n## Pools WETH-A & WETH-B deployed:');
+  console.log(`POOL_WETH_A_ADDRESS=${poolAddressWethA}`);
+  console.log(`POOL_WETH_B_ADDRESS=${poolAddressWethB}`);
 }
 
 main()

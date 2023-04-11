@@ -49,7 +49,6 @@
     "typecheck": "tsc --noEmit",
     "node:local": "npm run compile && npx hardhat node --network hardhat",
     "deploy:local": "./deployContracts.sh",
-    "pretest:local": "npm run deploy:local",
     "test:local": "npx hardhat test --network localhost"
   },
   "description": "1. AbstractFactory - Issues new tokens 2. Token - ERC20 Token that is a Quest",
