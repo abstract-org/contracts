@@ -13,11 +13,11 @@ async function main() {
     new ethers.Contract(SIMPLE_TOKEN_FACTORY_ADDRESS, SimpleFactoryArtifact.abi, deployer)
   );
 
-  const addressTokenA = await createToken(simpleFactory, initialSupply, deployer, {
-    name: 'A'
-  });
   const addressTokenB = await createToken(simpleFactory, initialSupply, deployer, {
     name: 'B'
+  });
+  const addressTokenA = await createToken(simpleFactory, initialSupply, deployer, {
+    name: 'A'
   });
 
   console.log('\n## Tokens A and B deployed:');

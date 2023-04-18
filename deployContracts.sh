@@ -48,7 +48,7 @@ HardhatRun() {
     fi
     echo -en "\n${description}..."
     npx hardhat run "${scriptPath}" --network ${network} >> "${env_file}"
-    echo -e "Done.\nWait $sleepTime sec." && sleep $sleepTime
+    echo -e "Done.\nWait $sleepTime sec." && sleep S$sleepTime
 }
 
 echo Removing ${env_file}
@@ -62,10 +62,11 @@ HardhatRun scripts/deploySimpleFactory.ts "Deploying SimpleTokenFactory" $long
 HardhatRun scripts/deployWethToken.ts "Deploying WETH Token"
 HardhatRun scripts/deployUniswap.ts "Deploying Uniswap contracts" $long
 
-HardhatRun scripts/deployTestToken.ts "Deploying TEST Token"
-HardhatRun scripts/deploySimpleTokens.ts "Deploying Simple Tokens A and B"
-
 if $execute_all; then
+# TOKENS
+  HardhatRun scripts/deployTestToken.ts "Deploying TEST Token"
+  HardhatRun scripts/deploySimpleTokens.ts "Deploying Simple Tokens A and B"
+# POOLS
   HardhatRun scripts/deployWethPools.ts "Deploying Pools WETH-A and WETH-B" $long
   HardhatRun scripts/deployCrossPool.ts "Deploying CrossPool A-B" $long
   HardhatRun scripts/deployTestPool.ts "Deploying Pool WETH-TEST" $long

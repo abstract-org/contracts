@@ -13,6 +13,9 @@ async function main() {
     new ethers.Contract(SIMPLE_TOKEN_FACTORY_ADDRESS, SimpleFactoryArtifact.abi, deployer)
   );
 
+  const someTokenAddress = await createToken(simpleFactory, initialSupply, deployer, {
+    name: 'ANY' + Math.round(Math.random() * 1000)
+  });
   const wethTokenAddress = await createToken(simpleFactory, initialSupply, deployer, { name: 'WETH' });
   console.log('\n## Token WETH deployed');
   console.log(`WETH_ADDRESS=${wethTokenAddress}`);
