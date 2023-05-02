@@ -15,6 +15,14 @@ type UniswapCtx = {
 };
 
 export async function getOrDeployPool(sqrtPrice: BigNumber, poolConfig: PoolConfig, ctx: UniswapCtx): Promise<string> {
+  const token0BigInt = BigInt(poolConfig.token0);
+  const token1BigInt = BigInt(poolConfig.token1);
+
+  if (token0BigInt > token1BigInt) {
+    [poolConfig.token0, poolConfig.token1] = [poolConfig.token1, poolConfig.token0];
+    console.log(`## Deploying ${poolConfig.token0}/${poolConfig.token1} inverted order`);
+  }
+
   const { token0, token1, fee } = poolConfig;
   const { factory, deployer, positionManager } = ctx;
 
@@ -24,13 +32,13 @@ export async function getOrDeployPool(sqrtPrice: BigNumber, poolConfig: PoolConf
     const tx = await positionManager
       .connect(deployer)
       .createAndInitializePoolIfNecessary(token0, token1, fee, sqrtPrice, {
-        gasLimit: 10000000
+        gasLimit: 30000000
       });
 
     await tx.wait();
 
     return await factory.connect(deployer).getPool(token0, token1, fee, {
-      gasLimit: ethers.utils.hexlify(1000000)
+      gasLimit: ethers.utils.hexlify(30000000)
     });
   } else {
     return existingPoolAddress;

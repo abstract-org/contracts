@@ -69,11 +69,10 @@ const config: HardhatUserConfig = {
       ]
     },
     ov: {
-      url: 'http://3.74.234.206:8077',
+      url: 'https://ovprivate.openvalue.xyz:8077',
       chainId: 42,
       accounts: [privateKey],
-      gas: 1000000,
-      gasPrice: 20000000000
+      gas: 30000000
     }
   },
   paths: {

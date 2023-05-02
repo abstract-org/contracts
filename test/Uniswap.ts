@@ -164,7 +164,7 @@ describe.only('Uniswap', () => {
     const existPoolAddr = await UniswapContracts.factory
       .connect(deployer)
       .getPool(TestToken.address, Weth.address, 500, {
-        gasLimit: ethers.utils.hexlify(3000000)
+        gasLimit: ethers.utils.hexlify(30000000)
       });
 
     const pool = new ethers.Contract(existPoolAddr, IUniswapV3PoolABI.abi, deployer);
@@ -198,7 +198,7 @@ describe.only('Uniswap', () => {
     const { mintParams, amount0Desired, amount1Desired } = await getAddPositionToPoolParams(pool);
     console.log('## Position Manager minting position with mintParams...');
     const positionMintTx = UniswapContracts.positionManager.connect(deployer).mint(mintParams, {
-      gasLimit: ethers.utils.hexlify(1000000)
+      gasLimit: ethers.utils.hexlify(30000000)
     });
 
     await expect(positionMintTx).to.emit(UniswapContracts.positionManager, 'IncreaseLiquidity');
@@ -226,7 +226,7 @@ describe.only('Uniswap', () => {
     const increaseLiquidityTx = UniswapContracts.positionManager
       .connect(deployer)
       .increaseLiquidity(increaseLiquidityParams, {
-        gasLimit: ethers.utils.hexlify(1000000)
+        gasLimit: ethers.utils.hexlify(30000000)
       });
 
     await expect(increaseLiquidityTx).to.emit(UniswapContracts.positionManager, 'IncreaseLiquidity');
@@ -268,7 +268,7 @@ describe.only('Uniswap', () => {
     const decreaseLiquidityTx = UniswapContracts.positionManager
       .connect(deployer)
       .decreaseLiquidity(decreaseLiquidityParams, {
-        gasLimit: ethers.utils.hexlify(1000000)
+        gasLimit: ethers.utils.hexlify(30000000)
       });
 
     await expect(decreaseLiquidityTx).to.emit(UniswapContracts.positionManager, 'DecreaseLiquidity');
@@ -333,7 +333,7 @@ describe.only('Uniswap', () => {
     // console.log(`# expecting TestToken balance of wallet[${deployer.address}] changed by:`, toETH(quotedAmountOut));
     await expect(
       UniswapContracts.router.connect(deployer).exactInputSingle(swapParams, {
-        gasLimit: ethers.utils.hexlify(5000000)
+        gasLimit: ethers.utils.hexlify(30000000)
       })
     ).to.changeTokenBalance(TestToken, deployer.address, `${quotedAmountOut}`);
     const printedPoolAfter = await printPool(pool);

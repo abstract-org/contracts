@@ -33,6 +33,14 @@ async function main() {
     console.log("Didn't find the pool, will create a new one");
   }
 
+  const token0BigInt = BigInt(poolConfig.token0);
+  const token1BigInt = BigInt(poolConfig.token1);
+
+  if (token0BigInt > token1BigInt) {
+    [poolConfig.token0, poolConfig.token1] = [poolConfig.token1, poolConfig.token0];
+    console.log(`## Deploying ${poolConfig.token0}/${poolConfig.token1} inverted order`);
+  }
+
   if (!existingPoolAddress || existingPoolAddress === '0x0000000000000000000000000000000000000000') {
     const tx = await positionManager
       .connect(deployer)
@@ -42,15 +50,14 @@ async function main() {
         poolConfig.fee,
         ethers.utils.parseEther('1'),
         {
-          gasLimit: 1000000,
-          gasPrice: 20000000000
+          gasLimit: 30000000
         }
       );
 
     await tx.wait();
 
     poolAddress = await factory.connect(deployer).getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee, {
-      gasLimit: ethers.utils.hexlify(1000000)
+      gasLimit: ethers.utils.hexlify(30000000)
     });
   } else {
     poolAddress = existingPoolAddress;

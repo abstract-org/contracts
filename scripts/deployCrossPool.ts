@@ -17,6 +17,14 @@ const poolConfig = {
   fee: 500
 };
 
+const token0BigInt = BigInt(poolConfig.token0);
+const token1BigInt = BigInt(poolConfig.token1);
+
+if (token0BigInt > token1BigInt) {
+  [poolConfig.token0, poolConfig.token1] = [poolConfig.token1, poolConfig.token0];
+  console.log(`## Deploying ${poolConfig.token0}/${poolConfig.token1} inverted order`);
+}
+
 async function main() {
   const [deployer] = await ethers.getSigners();
   const factory = new ethers.Contract(UNISWAP_FACTORY_ADDRESS, UniswapContractArtifacts.UniswapV3Factory.abi, deployer);

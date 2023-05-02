@@ -47,7 +47,7 @@ export async function deployPool(
     const tx = await UniswapContracts.positionManager
       .connect(deployer)
       .createAndInitializePoolIfNecessary(poolConfig.token0, poolConfig.token1, poolConfig.fee, sqrtPrice, {
-        gasLimit: 10000000
+        gasLimit: 30000000
       });
 
     receipt = await tx.wait();
@@ -55,7 +55,7 @@ export async function deployPool(
     poolAddress = await UniswapContracts.factory
       .connect(deployer)
       .getPool(poolConfig.token0, poolConfig.token1, poolConfig.fee, {
-        gasLimit: ethers.utils.hexlify(1000000)
+        gasLimit: ethers.utils.hexlify(30000000)
       });
   } else {
     poolAddress = existingPoolAddress;
